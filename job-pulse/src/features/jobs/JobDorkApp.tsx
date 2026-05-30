@@ -11,6 +11,8 @@ import { SkeletonGrid } from "./components/SkeletonGrid";
 import { EmptyState } from "./components/EmptyState";
 import { ErrorState } from "./components/ErrorState";
 import { FilterSidebar, type ClientFilters } from "./components/FilterSidebar";
+import linkedinIcon from "@/asset/linkedin.svg";
+import indeedIcon from "@/asset/indeed.svg";
 
 const INITIAL: FormState = {
   keywords: [],
@@ -46,6 +48,7 @@ export function JobDorkApp() {
   const [filters, setFilters] = useState<ClientFilters>(EMPTY_FILTERS);
   const [view, setView] = useState<"search" | "results">("search");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [activeSourceTab, setActiveSourceTab] = useState<"all" | "linkedin" | "indeed" | "google">("all");
   const ctrlRef = useRef<AbortController | null>(null);
 
   const patchForm = useCallback((p: Partial<FormState>) => setForm((f) => ({ ...f, ...p })), []);
@@ -65,9 +68,10 @@ export function JobDorkApp() {
       if (ctrl.signal.aborted) return;
       setResults(data);
       setStatus("success");
-    } catch (e: any) {
-      if (e?.name === "AbortError") return;
-      setError(e?.message ?? String(e));
+      setActiveSourceTab("all");
+    } catch (e: unknown) {
+      if (e instanceof Error && e.name === "AbortError") return;
+      setError(e instanceof Error ? e.message : String(e));
       setStatus("error");
     }
   }, [form]);
@@ -77,7 +81,8 @@ export function JobDorkApp() {
   }, []);
 
   // Derived: filtered + sorted
-  const visible = useMemo(() => {
+  // Derived: filtered by sidebar criteria (pre-source-tab filtering)
+  const filteredBySidebar = useMemo(() => {
     const COUNTRY_ALIASES: Record<string, string[]> = {
       egypt: ["egypt", "eg", "cairo", "giza", "alexandria"],
       usa: ["usa", "us", "united states", "america"],
@@ -102,7 +107,8 @@ export function JobDorkApp() {
       const n = parseFloat((x || "").toString().replace(/[,\s]/g, ""));
       return isNaN(n) ? 0 : n;
     };
-    let out = results.filter((r) => {
+
+    return results.filter((r) => {
       if (form.strictCountry && form.countries.length > 0) {
         const loc = (r.location || "").toLowerCase();
         const compAddr = (r.company_addresses || "").toLowerCase();
@@ -125,6 +131,50 @@ export function JobDorkApp() {
       }
       return true;
     });
+  }, [results, filters, form.strictCountry, form.countries]);
+
+  // Derived: counts for each source tab based on sidebar-filtered results
+  const tabCounts = useMemo(() => {
+    let linkedin = 0;
+    let indeed = 0;
+    let google = 0;
+
+    filteredBySidebar.forEach((r) => {
+      const site = (r.site || "").toLowerCase();
+      if (site === "linkedin") linkedin++;
+      else if (site === "indeed") indeed++;
+      else google++;
+    });
+
+    return {
+      all: filteredBySidebar.length,
+      linkedin,
+      indeed,
+      google,
+    };
+  }, [filteredBySidebar]);
+
+  // Derived: fully filtered + sorted for display
+  const visible = useMemo(() => {
+    let out = filteredBySidebar;
+
+    if (activeSourceTab === "linkedin") {
+      out = out.filter((r) => (r.site || "").toLowerCase() === "linkedin");
+    } else if (activeSourceTab === "indeed") {
+      out = out.filter((r) => (r.site || "").toLowerCase() === "indeed");
+    } else if (activeSourceTab === "google") {
+      out = out.filter((r) => {
+        const site = (r.site || "").toLowerCase();
+        return site !== "linkedin" && site !== "indeed";
+      });
+    }
+
+    const toN = (x: string | number) => {
+      if (typeof x === "number") return isNaN(x) ? 0 : x;
+      const n = parseFloat((x || "").toString().replace(/[,\s]/g, ""));
+      return isNaN(n) ? 0 : n;
+    };
+
     if (sort === "date") {
       out = [...out].sort((a, b) => {
         const da = a.date_posted ? new Date(a.date_posted).getTime() : 0;
@@ -137,15 +187,14 @@ export function JobDorkApp() {
       out = [...out].sort((a, b) => (a.company || "").localeCompare(b.company || ""));
     }
     return out;
-  }, [results, filters, sort]);
+  }, [filteredBySidebar, activeSourceTab, sort]);
 
   // Active filter pills (from form + client filters)
   const activePills = useMemo(() => {
     const pills: { id: string; label: string; remove: () => void }[] = [];
     form.keywords.forEach((k) => pills.push({ id: `kw-${k}`, label: k, remove: () => patchForm({ keywords: form.keywords.filter((x) => x !== k) }) }));
     form.countries.forEach((c) => pills.push({ id: `co-${c}`, label: c, remove: () => patchForm({ countries: form.countries.filter((x) => x !== c) }) }));
-    if (form.workType === "remote") pills.push({ id: "wt", label: "Remote", remove: () => patchForm({ workType: "both" }) });
-    if (form.workType === "onsite" && form.onsiteCity) pills.push({ id: "wt", label: `Onsite · ${form.onsiteCity}`, remove: () => patchForm({ workType: "both", onsiteCity: "" }) });
+    if (form.workType === "onsite" && form.onsiteCity) pills.push({ id: "wt", label: `Onsite · ${form.onsiteCity}`, remove: () => patchForm({ onsiteCity: "" }) });
     if (form.jobType !== "any") pills.push({ id: "jt", label: form.jobType, remove: () => patchForm({ jobType: "any" }) });
     pills.push({ id: "pw", label: { "24h": "Last 24h", "3d": "Last 3d", "7d": "Last 7d", "30d": "Last 30d" }[form.postedWithin], remove: () => patchForm({ postedWithin: "30d" }) });
     form.jobSites.forEach((s: SiteId) => pills.push({ id: `s-${s}`, label: SITE_LABEL[s], remove: () => patchForm({ jobSites: form.jobSites.filter((x) => x !== s) }) }));
@@ -200,6 +249,58 @@ export function JobDorkApp() {
           </aside>
 
           <main>
+            <div className="jd-source-tabs">
+              <button
+                type="button"
+                className={`jd-source-tab-btn ${activeSourceTab === "all" ? "active" : ""}`}
+                onClick={() => setActiveSourceTab("all")}
+              >
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="jd-tab-icon">
+                  <rect x="3" y="3" width="7" height="7" />
+                  <rect x="14" y="3" width="7" height="7" />
+                  <rect x="14" y="14" width="7" height="7" />
+                  <rect x="3" y="14" width="7" height="7" />
+                </svg>
+                <span>All Jobs</span>
+                <span className="jd-tab-badge">{tabCounts.all}</span>
+              </button>
+              
+              <button
+                type="button"
+                className={`jd-source-tab-btn ${activeSourceTab === "linkedin" ? "active" : ""}`}
+                onClick={() => setActiveSourceTab("linkedin")}
+              >
+                <img src={linkedinIcon} className="jd-tab-icon" alt="" />
+                <span>LinkedIn</span>
+                <span className="jd-tab-badge">{tabCounts.linkedin}</span>
+              </button>
+              
+              <button
+                type="button"
+                className={`jd-source-tab-btn ${activeSourceTab === "indeed" ? "active" : ""}`}
+                onClick={() => setActiveSourceTab("indeed")}
+              >
+                <img src={indeedIcon} className="jd-tab-icon" alt="" />
+                <span>Indeed</span>
+                <span className="jd-tab-badge">{tabCounts.indeed}</span>
+              </button>
+              
+              <button
+                type="button"
+                className={`jd-source-tab-btn ${activeSourceTab === "google" ? "active" : ""}`}
+                onClick={() => setActiveSourceTab("google")}
+              >
+                <svg viewBox="0 0 24 24" width="14" height="14" className="jd-tab-icon">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22c-.87-2.6-3.3-4.53-6.16-4.53z" />
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                </svg>
+                <span>Google Jobs</span>
+                <span className="jd-tab-badge">{tabCounts.google}</span>
+              </button>
+            </div>
+
             <div className="jd-toolbar">
               <div className="count" aria-live="polite">
                 {status === "loading" ? <span>Searching…</span> : <><b>{visible.length}</b>jobs found{visible.length !== results.length ? ` of ${results.length}` : ""}</>}

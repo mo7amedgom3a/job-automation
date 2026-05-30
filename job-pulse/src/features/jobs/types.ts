@@ -1,6 +1,6 @@
 export type SiteId = "linkedin" | "indeed" | "glassdoor" | "google" | "zip_recruiter";
 
-export type WorkType = "remote" | "onsite" | "both";
+export type WorkType = "remote" | "onsite";
 export type JobTypeOption = "any" | "full-time" | "part-time" | "contract" | "internship";
 
 export type PostedWithinKey = "24h" | "3d" | "7d" | "30d";

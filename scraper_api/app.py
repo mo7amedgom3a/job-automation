@@ -20,12 +20,12 @@ try:
     from scraper_api.cache import DeduplicationCache
     from scraper_api.dork_builder import DorkQueryBuilder
     from scraper_api.parser import JobResultParser
-    from scraper_api.searcher import DuckDuckGoSearcher, JobSpySearcher
+    from scraper_api.searcher import DuckDuckGoSearcher, JobSpySearcher, GoogleApiSearcher
 except ModuleNotFoundError:  # pragma: no cover - local script fallback
     from cache import DeduplicationCache
     from dork_builder import DorkQueryBuilder
     from parser import JobResultParser
-    from searcher import DuckDuckGoSearcher, JobSpySearcher
+    from searcher import DuckDuckGoSearcher, JobSpySearcher, GoogleApiSearcher
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("job-dork-api")
@@ -48,6 +48,7 @@ searcher = DuckDuckGoSearcher()
 parser = JobResultParser()
 cache = DeduplicationCache()
 jobspy_searcher = JobSpySearcher()
+google_searcher = GoogleApiSearcher()
 
 
 class SearchRequest(BaseModel):
@@ -143,64 +144,139 @@ async def health() -> dict[str, str]:
     }
 
 
+def is_within_24_hours(date_str: str, snippet: str = "") -> bool:
+    import re
+    if not date_str:
+        text_to_check = snippet.lower()
+    else:
+        text_to_check = date_str.lower()
+        
+    # Positive indicators (definitely within 24 hours)
+    if any(k in text_to_check for k in ["hour", "minute", "min", "second", "just now"]):
+        match = re.search(r'(\d+)\s+hours?\s+ago', text_to_check)
+        if match:
+            hours = int(match.group(1))
+            return hours <= 24
+        return True
+        
+    # Negative indicators (definitely older than 24 hours)
+    if any(k in text_to_check for k in ["day", "week", "month", "year", "yesterday"]):
+        return False
+        
+    # Calendar dates
+    months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
+    if any(m in text_to_check for m in months):
+        return False
+        
+    return True
+
+
 @app.post("/search", response_model=SearchResponse)
 async def search_jobs(req: SearchRequest) -> SearchResponse:
+    """
+    Main endpoint — n8n calls this every 6 hours.
+    Builds customized dork template queries → searches Google via Serper/SerpApi →
+    filters results strictly within 24 hours → parses → deduplicates → returns.
+    """
     start = time.time()
 
     if req.reset_cache:
         cache.clear()
         logger.info("Cache cleared by request")
 
-    queries = dork_builder.build(
+    # 1. Build dork template queries (exactly one query per board/site requested)
+    queries = dork_builder.build_template_queries(
         keywords=req.keywords,
         sites=req.job_sites,
         location=req.location,
-        countries=req.countries,
-        job_type=req.job_type,
-        experience=req.experience,
-        days_back=req.days_back,
     )
-    logger.info("Built %s dork queries", len(queries))
+    logger.info(f"Built {len(queries)} template-based dork queries")
 
-    raw_results = await searcher.search_all(
-        queries,
-        max_per_query=10,
-        timelimit=_ddg_timelimit(req.days_back, req.recent_hours),
-    )
+    # 2. Search all queries concurrently via Google API Searcher (with 24h filter)
+    import asyncio
+    tasks = [
+        google_searcher.search(q["query"], max_results=20)
+        for q in queries
+    ]
+    results_nested = await asyncio.gather(*tasks, return_exceptions=True)
+
+    raw_results = []
+    for q, res in zip(queries, results_nested):
+        if isinstance(res, Exception):
+            logger.warning(f"Google API search failed for query: {q['query'][:60]} — {res}")
+            continue
+        # Enrich raw results with metadata needed by the parser
+        for r in res:
+            r["_dork_query"] = q["query"]
+            r["_dork_keyword"] = q["keyword"]
+            r["_dork_site"] = q["site"]
+            r["_dork_strategy"] = q["strategy"]
+        raw_results.extend(res)
+    logger.info(f"Google API Search: Got {len(raw_results)} total raw results")
+
+    # 3. Post-filter results strictly within the past 24 hours
+    filtered_raw_results = []
+    discarded_count = 0
+    for r in raw_results:
+        if is_within_24_hours(r.get("date", ""), r.get("body", "")):
+            filtered_raw_results.append(r)
+        else:
+            discarded_count += 1
+    logger.info(f"Date post-filter: Retained {len(filtered_raw_results)} / {len(raw_results)} results (discarded {discarded_count} older than 24 hours)")
+    raw_results = filtered_raw_results
+
+    # 4. Parse each result into a structured job
     parsed = parser.parse_many(raw_results)
-    recent_jobs, recency_skipped = _filter_recent_jobs(
-        parsed,
-        recent_hours=req.recent_hours,
-        posted_today=req.posted_today,
-        strict_recent=req.strict_recent,
-    )
 
-    jobs: list[dict[str, Any]] = []
+    # 5. Deduplicate against seen URLs
+    jobs = []
     skipped = 0
-    for job in recent_jobs:
+    for job in parsed:
         if cache.is_seen(job["url"]):
             skipped += 1
             continue
         cache.mark_seen(job["url"])
         jobs.append(job)
 
-    if req.sort_by_posted_at:
-        jobs.sort(key=lambda item: (_parse_posted_at(item.get("posted_at")) or datetime.min, item.get("score", 0)), reverse=True)
-    else:
-        jobs.sort(key=lambda item: item.get("score", 0), reverse=True)
-    jobs = jobs[: req.max_results]
+    # 6. Sort by relevance score, cap at max_results
+    jobs.sort(key=lambda j: j.get("score", 0), reverse=True)
+    jobs = jobs[:req.max_results]
 
     duration = int((time.time() - start) * 1000)
+    logger.info(f"Returning {len(jobs)} new jobs ({skipped} skipped) in {duration}ms")
+
     return SearchResponse(
         jobs=[JobResult(**job) for job in jobs],
         total_found=len(parsed),
         new_jobs=len(jobs),
         cached_skipped=skipped,
-        recency_skipped=recency_skipped,
+        recency_skipped=discarded_count,
         queries_run=len(queries),
         duration_ms=duration,
         timestamp=datetime.utcnow().isoformat(),
     )
+
+
+@app.post("/search/orchestrate", response_model=dict[str, list[dict]])
+async def search_orchestrate(req: SearchRequest) -> dict[str, list[dict]]:
+    """
+    Orchestrate and aggregate isolated job searches across LinkedIn, Indeed, and Google Search API.
+    Returns a dictionary of results grouped by source.
+    """
+    logger.info("Received Orchestrated Search request")
+    try:
+        from scraper_api.orchestrator import JobOrchestrator
+    except ModuleNotFoundError:
+        from orchestrator import JobOrchestrator
+        
+    orchestrator = JobOrchestrator()
+    
+    if req.reset_cache:
+        orchestrator.cache.clear()
+        logger.info("Cache cleared by request")
+        
+    results = await orchestrator.orchestrate(req)
+    return results
 
 
 @app.post("/search/jobspy", response_model=list[dict])

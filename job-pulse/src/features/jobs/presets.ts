@@ -14,8 +14,8 @@ export const PRESETS: Preset[] = [
       keywords: ["devops", "software engineer"],
       countries: ["egypt"],
       postedWithin: "24h",
-      workType: "both",
-      onsiteCity: "",
+      workType: "onsite",
+      onsiteCity: "Cairo",
     },
   },
   {

@@ -89,9 +89,9 @@ export function SearchForm({ value, onChange, onSubmit, loading }: Props) {
         <div>
           <label className="jd-label">Work Type</label>
           <div className="jd-tabs">
-            {(["remote", "onsite", "both"] as WorkType[]).map((w) => (
+            {(["remote", "onsite"] as WorkType[]).map((w) => (
               <button key={w} type="button" className={value.workType === w ? "active" : ""} onClick={() => onChange({ workType: w })}>
-                {w === "remote" ? "Remote" : w === "onsite" ? "Onsite" : "Both"}
+                {w === "remote" ? "Remote" : "Onsite"}
               </button>
             ))}
           </div>

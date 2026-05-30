@@ -178,8 +178,11 @@ class DuckDuckGoSearcher:
             "All DuckDuckGo proxies exhausted or challenge-blocked. Initiating Yahoo Search fallback..."
         )
         try:
-            from scraper_api.yahoo_search_engine import YahooSearchEngine
-
+            try:
+                from scraper_api.yahoo_search_engine import YahooSearchEngine
+            except ModuleNotFoundError:
+                from yahoo_search_engine import YahooSearchEngine
+                
             yahoo = YahooSearchEngine(proxies=self.proxies)
             return yahoo.search(query, max_results)
         except Exception as yahoo_err:

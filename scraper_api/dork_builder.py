@@ -143,12 +143,76 @@ class DorkQueryBuilder:
         "senior":  ['"senior"', '"lead"', '"staff"', '"5+ years"'],
     }
 
-    # Job type modifiers
-    JOB_TYPE_MODIFIERS = {
-        "full-time": ['"full-time"', '"full time"'],
-        "contract":  ['"contract"', '"contractor"', '"freelance"'],
-        "part-time": ['"part-time"', '"part time"'],
-    }
+    def build_template_queries(
+        self,
+        keywords: list[str],
+        sites: list[str],
+        location: Optional[str] = "remote",
+    ) -> list[dict]:
+        """
+        Builds exactly one customized dork query per requested site based on standard templates.
+        """
+        from datetime import datetime, timedelta
+        
+        # Calculate yesterday's date in YYYY/MM/DD format
+        yesterday = datetime.utcnow() - timedelta(days=1)
+        after_date_str = yesterday.strftime("%Y/%m/%d")
+
+        # 1. Determine the keyword block
+        # If keywords are provided and customized (different from default), build dynamic OR block
+        default_req_kws = ["devops", "kubernetes", "terraform"]
+        if keywords and sorted(keywords) != sorted(default_req_kws):
+            formatted_kws = []
+            for kw in keywords:
+                kw_str = kw.strip()
+                if " " in kw_str and not (kw_str.startswith('"') and kw_str.endswith('"')):
+                    formatted_kws.append(f'"{kw_str}"')
+                else:
+                    formatted_kws.append(kw_str)
+            kw_block = "(" + " OR ".join(formatted_kws) + ")"
+        else:
+            # Use the default target keyword block provided by the user
+            kw_block = '("software engineer" OR "full stack" OR backend OR DevOps OR cloud OR SRE OR AWS OR DevSecOps OR "forward deployed engineer")'
+
+        # 2. Determine location type and geo block
+        is_remote = location.strip().lower() == "remote" if location else True
+        if is_remote:
+            geo_block = '(remote OR "work from home" OR WFH OR distributed OR worldwide)'
+        else:
+            geo_block = '(Cairo OR "Greater Cairo" OR Egypt)'
+
+        job_block = '(job OR jobs OR hiring OR vacancy OR vacancies OR opening OR openings)'
+
+        queries = []
+        for site in sites:
+            site_lower = site.lower().strip()
+            
+            # Map site to standard site domain
+            if "linkedin" in site_lower:
+                site_domain = "site:linkedin.com/jobs/view"
+            elif "indeed" in site_lower:
+                site_domain = "site:indeed.com"
+            elif "glassdoor" in site_lower:
+                site_domain = "site:glassdoor.com"
+            elif "remotive" in site_lower:
+                site_domain = "site:remotive.com"
+            else:
+                site_domain = f"site:{site}"
+
+            # Remotive does not have exclusions block in the template
+            if "remotive" in site_lower:
+                q = f'{kw_block} {geo_block} {job_block} {site_domain} after:{after_date_str}'
+            else:
+                q = f'{kw_block} {geo_block} {job_block} {site_domain} -intern -internship -graduate after:{after_date_str}'
+
+            queries.append({
+                "query": q,
+                "keyword": "template_keywords",
+                "site": site,
+                "strategy": "dork_template",
+            })
+
+        return queries
 
     def build(
         self,

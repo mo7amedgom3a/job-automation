@@ -300,3 +300,86 @@
 .jobdork ::-webkit-scrollbar { width: 8px; height: 8px; }
 .jobdork ::-webkit-scrollbar-thumb { background: var(--jd-border-strong); border-radius: 4px; }
 .jobdork ::-webkit-scrollbar-track { background: transparent; }
+
+/* Premium Glassmorphic Source Tabs */
+.jd-source-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 6px;
+  background: rgba(21, 24, 31, 0.45);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-radius: 14px;
+  border: 1px solid var(--jd-border);
+  margin-bottom: 24px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  box-shadow: 0 4px 20px -8px rgba(0, 0, 0, 0.5);
+}
+.jd-source-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.jd-source-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--jd-muted);
+  font-family: "Sora", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.jd-source-tab-btn:hover {
+  color: var(--jd-text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.jd-source-tab-btn.active {
+  color: var(--jd-cyan);
+  background: rgba(0, 212, 255, 0.08);
+  border-color: rgba(0, 212, 255, 0.3);
+  box-shadow: 0 0 16px -4px rgba(0, 212, 255, 0.25);
+  font-weight: 600;
+}
+
+.jd-tab-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.jd-source-tab-btn.active .jd-tab-icon {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 4px rgba(0, 212, 255, 0.4));
+}
+
+.jd-tab-badge {
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--jd-muted);
+  transition: all 0.25s ease;
+}
+
+.jd-source-tab-btn:hover .jd-tab-badge {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--jd-text);
+}
+
+.jd-source-tab-btn.active .jd-tab-badge {
+  background: rgba(0, 212, 255, 0.15);
+  color: var(--jd-cyan);
+}

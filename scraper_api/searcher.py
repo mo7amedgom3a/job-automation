@@ -12,6 +12,7 @@ _ENGINE_CLASS_MAP = {
     "yahoo": "scraper_api.yahoo_search_engine.YahooSearchEngine",
     "jobspy": "scraper_api.jobspy_search_engine.JobSpySearcher",
     "python-jobspy": "scraper_api.jobspy_search_engine.JobSpySearcher",
+    "google_api": "scraper_api.google_api_search_engine.GoogleApiSearcher",
 }
 
 
@@ -26,7 +27,18 @@ def load_search_engine(engine_name: str) -> Any:
         )
 
     module_path, class_name = _ENGINE_CLASS_MAP[key].rsplit(".", 1)
-    module = importlib.import_module(module_path)
+    try:
+        module = importlib.import_module(module_path)
+    except ModuleNotFoundError:
+        if module_path.startswith("scraper_api."):
+            local_path = module_path.replace("scraper_api.", "", 1)
+            try:
+                module = importlib.import_module(local_path)
+            except ModuleNotFoundError:
+                raise
+        else:
+            raise
+            
     return getattr(module, class_name)
 
 
@@ -52,6 +64,15 @@ except (ImportError, SystemError) as exc:  # pragma: no cover
         logger.warning("Failed to import DuckDuckGoSearcher: %s; fallback failed: %s", exc, exc2)
 
 try:
+    from .google_api_search_engine import GoogleApiSearcher
+except (ImportError, SystemError) as exc:  # pragma: no cover
+    try:
+        from google_api_search_engine import GoogleApiSearcher
+    except ImportError as exc2:
+        GoogleApiSearcher = None
+        logger.warning("Failed to import GoogleApiSearcher: %s; fallback failed: %s", exc, exc2)
+
+try:
     from .jobspy_search_engine import JobSpySearcher
 except (ImportError, SystemError) as exc:  # pragma: no cover
     try:
@@ -74,6 +95,7 @@ __all__ = [
     "Searcher",
     "load_search_engine",
     "DuckDuckGoSearcher",
+    "GoogleApiSearcher",
     "JobSpySearcher",
     "YahooSearchEngine",
 ]

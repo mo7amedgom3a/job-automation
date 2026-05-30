@@ -6,6 +6,10 @@ services:
     restart: unless-stopped
     ports:
       - "8000:8000"
+    volumes:
+      - ./scraper_api:/app
+    env_file:
+      - .env
     environment:
       - PYTHONUNBUFFERED=1
     networks:

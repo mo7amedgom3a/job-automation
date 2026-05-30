@@ -16,7 +16,7 @@ import os
 from datetime import datetime
 
 from scraper_api.dork_builder import DorkQueryBuilder
-from scraper_api.searcher import DuckDuckGoSearcher, JobSpySearcher
+from scraper_api.searcher import DuckDuckGoSearcher, JobSpySearcher, GoogleApiSearcher
 from scraper_api.parser import JobResultParser
 from scraper_api.cache import DeduplicationCache
 
@@ -42,6 +42,7 @@ searcher     = DuckDuckGoSearcher()
 parser       = JobResultParser()
 cache        = DeduplicationCache()
 jobspy_searcher = JobSpySearcher()
+google_searcher = GoogleApiSearcher()
 
 
 # ── Request / Response models ────────────────────────────────────────────────
@@ -101,11 +102,39 @@ async def health():
     return {"status": "ok", "service": "job-dork-search", "time": datetime.utcnow().isoformat()}
 
 
+def is_within_24_hours(date_str: str, snippet: str = "") -> bool:
+    import re
+    if not date_str:
+        text_to_check = snippet.lower()
+    else:
+        text_to_check = date_str.lower()
+        
+    # Positive indicators (definitely within 24 hours)
+    if any(k in text_to_check for k in ["hour", "minute", "min", "second", "just now"]):
+        match = re.search(r'(\d+)\s+hours?\s+ago', text_to_check)
+        if match:
+            hours = int(match.group(1))
+            return hours <= 24
+        return True
+        
+    # Negative indicators (definitely older than 24 hours)
+    if any(k in text_to_check for k in ["day", "week", "month", "year", "yesterday"]):
+        return False
+        
+    # Calendar dates
+    months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
+    if any(m in text_to_check for m in months):
+        return False
+        
+    return True
+
+
 @app.post("/search", response_model=SearchResponse)
 async def search_jobs(req: SearchRequest):
     """
     Main endpoint — n8n calls this every 6 hours.
-    Builds dork queries → searches DuckDuckGo → parses → deduplicates → returns.
+    Builds customized dork template queries → searches Google via Serper/SerpApi →
+    filters results strictly within 24 hours → parses → deduplicates → returns.
     """
     start = time.time()
 
@@ -113,24 +142,50 @@ async def search_jobs(req: SearchRequest):
         cache.clear()
         logger.info("Cache cleared by request")
 
-    # 1. Build dork queries
-    queries = dork_builder.build(
+    # 1. Build dork template queries (exactly one query per board/site requested)
+    queries = dork_builder.build_template_queries(
         keywords=req.keywords,
         sites=req.job_sites,
         location=req.location,
-        job_type=req.job_type,
-        experience=req.experience,
     )
-    logger.info(f"Built {len(queries)} dork queries")
+    logger.info(f"Built {len(queries)} template-based dork queries")
 
-    # 2. Search all queries concurrently (with rate-limit semaphore)
-    raw_results = await searcher.search_all(queries, max_per_query=10)
-    logger.info(f"Got {len(raw_results)} raw results")
+    # 2. Search all queries concurrently via Google API Searcher (with 24h filter)
+    tasks = [
+        google_searcher.search(q["query"], max_results=20)
+        for q in queries
+    ]
+    results_nested = await asyncio.gather(*tasks, return_exceptions=True)
 
-    # 3. Parse each result into a structured job
+    raw_results = []
+    for q, res in zip(queries, results_nested):
+        if isinstance(res, Exception):
+            logger.warning(f"Google API search failed for query: {q['query'][:60]} — {res}")
+            continue
+        # Enrich raw results with metadata needed by the parser
+        for r in res:
+            r["_dork_query"] = q["query"]
+            r["_dork_keyword"] = q["keyword"]
+            r["_dork_site"] = q["site"]
+            r["_dork_strategy"] = q["strategy"]
+        raw_results.extend(res)
+    logger.info(f"Google API Search: Got {len(raw_results)} total raw results")
+
+    # 3. Post-filter results strictly within the past 24 hours
+    filtered_raw_results = []
+    discarded_count = 0
+    for r in raw_results:
+        if is_within_24_hours(r.get("date", ""), r.get("body", "")):
+            filtered_raw_results.append(r)
+        else:
+            discarded_count += 1
+    logger.info(f"Date post-filter: Retained {len(filtered_raw_results)} / {len(raw_results)} results (discarded {discarded_count} older than 24 hours)")
+    raw_results = filtered_raw_results
+
+    # 4. Parse each result into a structured job
     parsed = parser.parse_many(raw_results)
 
-    # 4. Deduplicate against seen URLs
+    # 5. Deduplicate against seen URLs
     new_jobs = []
     skipped  = 0
     for job in parsed:
@@ -140,7 +195,7 @@ async def search_jobs(req: SearchRequest):
         cache.mark_seen(job["url"])
         new_jobs.append(job)
 
-    # 5. Sort by relevance score, cap at max_results
+    # 6. Sort by relevance score, cap at max_results
     new_jobs.sort(key=lambda j: j.get("score", 0), reverse=True)
     new_jobs = new_jobs[:req.max_results]
 
