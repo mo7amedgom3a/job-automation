@@ -1,0 +1,604 @@
+Starting diagnostic scrape for Egypt...
+Scraped 100 jobs successfully!
+
+--- JOB DETAILS ---
+Title: Junior Software Engineer (Remote)
+Company: PolicyMe
+Location: 'Ontario, CA'
+Is Remote: True
+Company Addresses: None
+------------------------------
+Title: Backend / Frontend Developer Intern
+Company: Prospect Equities®
+Location: 'Chicago, IL'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer, Integrations
+Company: SchooLinks
+Location: ''
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Developer, Software Engineering
+Company: Tesla
+Location: 'Palo Alto, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer, Backend
+Company: Mirage
+Location: 'New York, NY'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer - Backend
+Company: Snowflake
+Location: 'Menlo Park, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer (Remote)
+Company: PolicyMe
+Location: 'Ontario, CA'
+Is Remote: True
+Company Addresses: None
+------------------------------
+Title: Software Engineer
+Company: Pylon
+Location: 'San Francisco, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer
+Company: Uber
+Location: 'San Francisco, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer
+Company: InterImage
+Location: 'Arlington, VA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Developer - Fall Internship 2026
+Company: Al Warren Oil
+Location: 'Bensenville, IL'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Fullstack Engineer (Python / React)
+Company: Pinwheel
+Location: 'New York, NY'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer - FinLab
+Company: McKinsey & Company
+Location: 'New York, NY'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Junior Data Scientist
+Company: TIFIN
+Location: ''
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer, Backend, Factory Software
+Company: Tesla
+Location: 'Fremont, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer, Robotaxi & Optimus
+Company: Tesla
+Location: 'Palo Alto, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Fullstack Software Engineer
+Company: Tesla
+Location: 'Palo Alto, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Founding Backend Engineer
+Company: Workwolf
+Location: 'San Francisco, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer
+Company: Salma Health
+Location: 'Sacramento, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer — Integrations
+Company: Kodex
+Location: ''
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer (Mid or Senior), School Integrations
+Company: Clever Inc.
+Location: 'San Francisco, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Internship, Software Engineer, Data Platforms (Fall 2026)
+Company: Tesla
+Location: 'Palo Alto, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Vice President, Software Engineering
+Company: Verra Mobility
+Location: 'Mesa, AZ'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: SDET / Test Engineer (Software Engineering Background)
+Company: Largeton Group
+Location: 'Redmond, WA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer, Geometric Vision, Tesla AI
+Company: Tesla
+Location: 'Palo Alto, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Backend Software Developer, Jr.
+Company: Sundayy
+Location: ''
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer
+Company: enGen
+Location: ''
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer - Mid
+Company: Spear AI
+Location: 'Washington, DC'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Senior Software Engineer, Ad Serving
+Company: Roku
+Location: 'San Jose, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer, People Systems & Analytics
+Company: Tesla
+Location: 'Palo Alto, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer, Infrastructure – San Francisco
+Company: Flow Engineering
+Location: 'San Francisco, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer
+Company: Harvey
+Location: 'San Francisco, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer, Reliability
+Company: Checkr, Inc.
+Location: 'San Francisco, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer, Reliability
+Company: Checkr, Inc.
+Location: 'Denver, CO'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: CloudOps Engineer
+Company: Flourish
+Location: 'New York, United States'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Backend Software Engineer
+Company: Lumafield
+Location: 'San Francisco, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Backend and System Engineer, Flows
+Company: Postman
+Location: 'New York, NY'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: AI Software Engineer
+Company: Venture Up
+Location: 'San Francisco, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer
+Company: Pilot.com
+Location: 'San Francisco, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer, Developer Productivity
+Company: Glean
+Location: 'Mountain View, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer (Cloud, Cross-Platform & .NET Systems)
+Company: Altom Transport
+Location: 'Chicago, IL'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer
+Company: Red Hat
+Location: 'Raleigh, NC'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Full Stack Engineer
+Company: SS&C Technologies
+Location: 'California, United States'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Internship, Software Engineer, Simulation Platform (Fall 2026)
+Company: Tesla
+Location: 'Palo Alto, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Senior Software Engineer, Backend
+Company: Paperless Post
+Location: 'San Francisco, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Senior Software Engineer
+Company: FleetWorks
+Location: 'San Francisco, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Founding Engineer (AI + Backend)
+Company: OpenFunnel (YC F24)
+Location: 'San Francisco, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Full-Stack Software Engineer
+Company: H1
+Location: ''
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer, Backend (All Teams)
+Company: DoorDash
+Location: 'Los Angeles, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer, Backend (All Teams)
+Company: DoorDash
+Location: 'San Francisco, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Internship, Software Integration Engineer, Factory Firmware (Fall 2026)
+Company: Tesla
+Location: 'Palo Alto, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Senior Software Engineer - Data Insights
+Company: Roku
+Location: 'San Jose, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Development Engineer
+Company: CVS Health
+Location: 'Hartford, CT'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer, iOS/Mobile
+Company: Beacon AI
+Location: 'San Carlos, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Java Full Stack Developer
+Company: Bright Vision Technologies
+Location: 'Frisco, TX'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Head of Engineering ($200k-$250k + Equity) at Heavybit and Uncork Capital-backed cloud financial platform
+Company: Jack & Jill
+Location: 'San Francisco, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Senior Software Engineer, Backend
+Company: Paperless Post
+Location: 'Houston, TX'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer 3 - (Python, JavaScript, TypeScript)
+Company: Akina, Inc
+Location: 'Fort Meade, MD'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Backend Developer [33160]
+Company: Stealth Startup
+Location: 'New York, United States'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Entry Level Software Engineer
+Company: TEKsystems
+Location: 'Pittsburgh, PA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Development Engineer in Test
+Company: Ringside Talent
+Location: 'Ohio, United States'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer III, Infrastructure, Cloud
+Company: Google
+Location: 'Sunnyvale, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Development Engineer, Developer Experience
+Company: Amazon
+Location: 'New York, NY'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Developer
+Company: General Atomics Aeronautical Systems
+Location: 'Poway, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Sr. Backend Engineer, Data Platform, Vehicle Software
+Company: Tesla
+Location: 'Palo Alto, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer, Firmware Platforms, Vehicle Software
+Company: Tesla
+Location: 'Palo Alto, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer, Vehicle UI Development
+Company: Tesla
+Location: 'Palo Alto, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer, MLOps, Manufacturing Quality
+Company: Tesla
+Location: 'Fremont, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer II, Search & Recs
+Company: Wayfair
+Location: 'Mountain View, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Sr. Software Engineer, Backend, Factory Software
+Company: Tesla
+Location: 'Buffalo, NY'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Senior Software Engineer
+Company: Source One Technical Solutions
+Location: 'Foster City, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Data Science Intern
+Company: Cummings Electrical
+Location: 'Salt Lake City, UT'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Full Stack Developer
+Company: OneSource Virtual
+Location: ''
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer Level 2 -FFPP-8834
+Company: Onyx Point, LLC.
+Location: 'Hanover, MD'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Internship, Software Compiler Engineer, AI Inference (Summer 2026)
+Company: Tesla
+Location: 'Palo Alto, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Senior Software Engineer
+Company: LPL Financial
+Location: 'New York, United States'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Intern - Embedded Software Engineer (Summer 2026)
+Company: ALC
+Location: 'New York, NY'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Java/AWS Software Engineer III
+Company: Denali Advanced Integration
+Location: 'Redmond, WA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Senior Integration Developer (Developer III)
+Company: INSPYR Solutions
+Location: 'Charlotte, NC'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer [Multiple Positions Available]
+Company: JPMorganChase
+Location: 'Plano, TX'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Staff Software Engineer 1 (L6)
+Company: Stepful
+Location: 'New York, NY'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Developer  Java / J2EE / Oracle
+Company: SIRITECH SOLUTIONS CORP
+Location: 'Albany, NY'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Robotics Systems Engineer, Optimus
+Company: Tesla
+Location: 'Palo Alto, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Electrical Engineer & Python Expert - Freelance AI Trainer
+Company: Mindrift
+Location: 'Houston, TX'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Mechanical Engineer & Python Expert - Freelance AI Trainer
+Company: Mindrift
+Location: 'North Carolina, United States'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Development Engineer II, 3rd Party Fulfillment
+Company: Wayfair
+Location: 'Boston, MA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Internship, Robotics Modeling & Simulation Engineer, Optimus (Fall 2026)
+Company: Tesla
+Location: 'Palo Alto, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Scrum Master
+Company: Ringside Talent
+Location: 'Ohio, United States'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Internship, Data Engineer, Fleet Analytics (Fall 2026)
+Company: Tesla
+Location: 'Palo Alto, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Data Scientist
+Company: TEKsystems
+Location: 'New York, NY'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Java Backend Developer
+Company: Capgemini
+Location: 'Atlanta, GA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: AI Agentic Developer - Remote
+Company: Galactic Minds INC
+Location: 'San Francisco, CA'
+Is Remote: True
+Company Addresses: None
+------------------------------
+Title: Senior Software Engineer - Pulse
+Company: Pindrop
+Location: 'Atlanta, GA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Software Engineer
+Company: TalentAlly
+Location: 'Irvine, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Staff Software Engineer - BE Python
+Company: Venmo
+Location: 'San Jose, CA'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Senior Full Stack Engineer - Fintech
+Company: Career Renew
+Location: 'Jersey City, NJ'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Senior/Lead Backend Engineer
+Company: Medal
+Location: 'New York, NY'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Backend Software Java Engineer
+Company: The Depository Trust & Clearing Corporation (DTCC)
+Location: 'Tampa, FL'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: Senior C# .Net Software Engineer (React)
+Company: Versique Executive, Professional & Interim Recruiting
+Location: 'Maple Grove, MN'
+Is Remote: False
+Company Addresses: None
+------------------------------
+Title: ETL Developer - US Healthcare Experience
+Company: InterScripts, Inc.
+Location: 'Chantilly, VA'
+Is Remote: False
+Company Addresses: None
+------------------------------

@@ -1,0 +1,59 @@
+services:
+  job-dork-api:
+    build:
+      context: ./scraper_api
+    container_name: job-dork-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - n8n_net
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=5)",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: job_automation_n8n
+    restart: unless-stopped
+    depends_on:
+      job-dork-api:
+        condition: service_healthy
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./local_db:/local_db
+    networks:
+      - n8n_net
+    environment:
+      - GENERIC_TIMEZONE=Africa/Cairo
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - WEBHOOK_URL=http://localhost:5678/
+      - DB_TYPE=sqlite
+      - DB_SQLITE_DATABASE=/home/node/.n8n/database.sqlite
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-5798312780}
+      - BLOCKLIST_SHEET_ID=${BLOCKLIST_SHEET_ID:-175fSfxMrOj6LaT4bUjTXnMgLscUtWiVqKyGlSCx2BWo}
+      - BLOCKED_COMPANIES=${BLOCKED_COMPANIES:-}
+      - JOB_DORK_API_URL=http://job-dork-api:8000
+      - SEARCH_API_URL=http://job-dork-api:8000
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL:-openai/gpt-oss-120b:free}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-replace_me}
+
+volumes:
+  n8n_data:
+
+networks:
+  n8n_net:
+    driver: bridge
