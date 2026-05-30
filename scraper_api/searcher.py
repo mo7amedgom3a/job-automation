@@ -44,12 +44,30 @@ class Searcher:
 
 try:
     from .ddg_search_engine import DuckDuckGoSearcher
+except (ImportError, SystemError) as exc:  # pragma: no cover
+    try:
+        from ddg_search_engine import DuckDuckGoSearcher
+    except ImportError as exc2:
+        DuckDuckGoSearcher = None
+        logger.warning("Failed to import DuckDuckGoSearcher: %s; fallback failed: %s", exc, exc2)
+
+try:
     from .jobspy_search_engine import JobSpySearcher
+except (ImportError, SystemError) as exc:  # pragma: no cover
+    try:
+        from jobspy_search_engine import JobSpySearcher
+    except ImportError as exc2:
+        JobSpySearcher = None
+        logger.warning("Failed to import JobSpySearcher: %s; fallback failed: %s", exc, exc2)
+
+try:
     from .yahoo_search_engine import YahooSearchEngine
-except ImportError:  # pragma: no cover
-    DuckDuckGoSearcher = None
-    JobSpySearcher = None
-    YahooSearchEngine = None
+except (ImportError, SystemError) as exc:  # pragma: no cover
+    try:
+        from yahoo_search_engine import YahooSearchEngine
+    except ImportError as exc2:
+        YahooSearchEngine = None
+        logger.warning("Failed to import YahooSearchEngine: %s; fallback failed: %s", exc, exc2)
 
 
 __all__ = [
