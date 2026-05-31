@@ -77,6 +77,7 @@ class SearchRequest(BaseModel):
             "jobicy.com",
         ]
     )
+    work_type: str | None = None
     location: str | None = "remote"
     countries: list[str] = Field(
         default_factory=lambda: ["egypt", "Middle East", "eu", "usa", "canada", "Germany", "france", "uk"]

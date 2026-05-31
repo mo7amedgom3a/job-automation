@@ -1,18 +1,22 @@
 import logging
 from jobspy import scrape_jobs
+import sys
+from pathlib import Path
 
 logging.basicConfig(level=logging.INFO)
 
 print("Starting diagnostic scrape for Egypt...")
 job_types = ["backend", "Full Stack", "engineer", "DevOps", "Cloud"]
 search_term = [f'"{job_type}"' for job_type in job_types]
+
 linkedin_scraper = scrape_jobs(
     site_name=["linkedin"],
     search_term="'software engineer' OR backend OR 'Full Stack' OR python OR DevOps OR Cloud",
     location="Cairo",
+    is_remote=True,
     results_wanted=100,
     location_linkedin="Egypt",
-    hours_old=24
+    hours_old=170,
 )
 
 if linkedin_scraper is not None and not linkedin_scraper.empty:

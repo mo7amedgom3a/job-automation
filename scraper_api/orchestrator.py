@@ -41,12 +41,21 @@ class JobOrchestrator:
         # Load keywords
         keywords = req.keywords if req.keywords else [
             "software engineer", "full stack", "backend", "DevOps", 
-            "cloud", "SRE", "AWS", "DevSecOps", "forward deployed engineer"
+            "cloud", "SRE", "AWS", "DevSecOps", "forward deployed engineer",
+            "AI", "Engineer", "Developer", "Programmer", "web developer",
+            
         ]
 
         # Determine if remote
-        is_remote = (req.location == "remote") if req.location else True
-        location_val = "remote" if is_remote else (req.location or "Cairo")
+        work_type_val = getattr(req, "work_type", None)
+        if work_type_val == "remote":
+            is_remote = True
+        elif work_type_val == "onsite":
+            is_remote = False
+        else:
+            is_remote = (req.location == "remote") if req.location else True
+
+        location_val = "remote" if (is_remote and (not req.location or req.location == "remote")) else (req.location or "Cairo")
 
         # Determine country constraints for JobSpy
         primary_country = "Egypt"
@@ -86,7 +95,7 @@ class JobOrchestrator:
         tasks.append(self._search_google_dork(
             keywords=keywords,
             sites=req.job_sites,
-            location=location_val,
+            location="remote" if is_remote else location_val,
             max_results=req.max_results
         ))
 
@@ -133,7 +142,8 @@ class JobOrchestrator:
             }
             if is_remote:
                 params["is_remote"] = True
-                params["location"] = country if country != "Egypt" else "worldwide"
+                params["location"] = country if (not location or location == "remote") else location
+                params["location_linkedin"] = country
             else:
                 params["location"] = location
                 params["location_linkedin"] = country
@@ -222,6 +232,8 @@ class JobOrchestrator:
                 "remotive.com",
                 "wellfound.com",
                 "greenhouse.io",
+                "job-boards.greenhouse.io",
+                "remoteok.io",
                 "lever.co",
                 "workable.com",
                 "jobs.ashbyhq.com",
@@ -234,7 +246,7 @@ class JobOrchestrator:
         queries = self.dork_builder.build_template_queries(
             keywords=keywords,
             sites=filtered_sites,
-            location="remote",
+            location=location,
         )
         logger.info(f"Orchestrator: Built {len(queries)} Google template queries.")
 

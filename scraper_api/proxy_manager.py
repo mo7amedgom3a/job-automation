@@ -45,8 +45,8 @@ class ProxyManager:
 
     def load_dynamic_from_geonode(
         self,
-        protocols: str = "socks5",
-        filter_last_checked: int = 1,
+        protocols: str = "http,https",
+        filter_last_checked: int = 60,
         speed: str = "fast",
         page: int = 1,
         limit: int = 500,
@@ -96,8 +96,9 @@ class ProxyManager:
         if not ip or not port or not protocols:
             return None
 
-        protocol = protocols[0]
-        if protocol not in {"http", "https", "socks4", "socks5"}:
+        preferred_protocols = ("https", "http", "socks5", "socks4")
+        protocol = next((p for p in preferred_protocols if p in protocols), None)
+        if protocol is None:
             return None
 
         return f"{protocol}://{ip}:{port}"

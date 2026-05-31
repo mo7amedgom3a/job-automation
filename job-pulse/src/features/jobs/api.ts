@@ -29,13 +29,18 @@ function postedWithinToTime(k: PostedWithinKey): { recent_hours: number | null; 
 export function buildPayload(f: FormState): SearchPayload {
   const time = postedWithinToTime(f.postedWithin);
   let location: string | null;
-  if (f.workType === "remote") location = "remote";
-  else if (f.workType === "onsite") location = f.onsiteCity.trim() || null;
-  else location = null;
+  if (f.workType === "remote") {
+    location = f.onsiteCity.trim() || "remote";
+  } else if (f.workType === "onsite") {
+    location = f.onsiteCity.trim() || (f.countries.length > 0 ? f.countries[0] : "Egypt");
+  } else {
+    location = null;
+  }
 
   return {
     keywords: f.keywords,
     job_sites: f.jobSites.map((s) => SITE_DOMAIN[s] ?? s),
+    work_type: f.workType,
     location,
     countries: f.countries,
     job_type: f.jobType === "any" ? null : f.jobType,

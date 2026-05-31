@@ -1,0 +1,84 @@
+Starting diagnostic scrape for Egypt...
+Scraped 16 jobs successfully!
+
+--- JOB DETAILS ---
+Title: Commercial Finance Specialist (Spanish/ Turkish Speakers), Cairo
+Company: SAP
+Location: 'القاهرة, C, EG'
+Company Addresses: 'Dietmar-Hopp-Allee 16\r\nWalldorf, 69190\r\nGermany'
+------------------------------
+Title: Senior AI Engineer
+Company: Coca-Cola HBC
+Location: 'القاهرة, C, EG'
+Company Addresses: 'Zug, GR'
+------------------------------
+Title: Sales Engineer مهندس مبيعات
+Company: nan
+Location: 'القاهرة, C, EG'
+Company Addresses: nan
+------------------------------
+Title: Associate Technical Support Specialist
+Company: Milestone Technologies
+Location: 'القاهرة, C, EG'
+Company Addresses: nan
+------------------------------
+Title: Commercial Leadership Development Program - Sales Engineer
+Company: Eaton
+Location: 'القاهرة الجديدة, C, EG'
+Company Addresses: 'Dublin, Dublin'
+------------------------------
+Title: Architecture Engineer
+Company: CSI Global
+Location: 'القاهرة, C, EG'
+Company Addresses: nan
+------------------------------
+Title: Land Surveyor
+Company: CSI Global
+Location: 'القاهرة, C, EG'
+Company Addresses: nan
+------------------------------
+Title: Junior Electrical Design Engineer
+Company: CSI Global
+Location: 'القاهرة, C, EG'
+Company Addresses: nan
+------------------------------
+Title: Senior Civil Engineer
+Company: CSI Global
+Location: 'القاهرة, C, EG'
+Company Addresses: nan
+------------------------------
+Title: Contracts & Claims Engineer
+Company: CSI Global
+Location: 'القاهرة, C, EG'
+Company Addresses: nan
+------------------------------
+Title: Planning Engineer
+Company: CSI Global
+Location: 'القاهرة, C, EG'
+Company Addresses: nan
+------------------------------
+Title: Senior Electrical Design Engineer
+Company: CSI Global
+Location: 'القاهرة, C, EG'
+Company Addresses: nan
+------------------------------
+Title: Sr. Commercial Engineer
+Company: CSI Global
+Location: 'القاهرة, C, EG'
+Company Addresses: nan
+------------------------------
+Title: Junior Civil Engineer
+Company: CSI Global
+Location: 'القاهرة, C, EG'
+Company Addresses: nan
+------------------------------
+Title: Quality Manager
+Company: CSI Global
+Location: 'القاهرة, C, EG'
+Company Addresses: nan
+------------------------------
+Title: Project Controls Lead
+Company: CSI Global
+Location: 'القاهرة, C, EG'
+Company Addresses: nan
+------------------------------

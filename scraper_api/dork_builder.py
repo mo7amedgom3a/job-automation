@@ -179,7 +179,13 @@ class DorkQueryBuilder:
         if is_remote:
             geo_block = '(remote OR "work from home" OR WFH OR distributed OR worldwide)'
         else:
-            geo_block = '(Cairo OR "Greater Cairo" OR Egypt)'
+            loc_clean = location.strip().lower()
+            if loc_clean in self.COUNTRY_TARGETS:
+                terms = self.COUNTRY_TARGETS[loc_clean]["terms"]
+                geo_block = "(" + " OR ".join(terms) + ")"
+            else:
+                # If they passed a specific city/location name, use it
+                geo_block = f'("{location}")'
 
         job_block = '(job OR jobs OR hiring OR vacancy OR vacancies OR opening OR openings)'
 
@@ -230,9 +236,9 @@ class DorkQueryBuilder:
         """
         queries = []
 
-        # Note: DuckDuckGo / metasearch backends do not support the 'after:YYYY-MM-DD' operator
-        # inside the search input box. Outbound date filtering is managed natively at the
-        # search engine level using the 'timelimit' API parameter (df=d, df=w, etc.).
+        # Calculate date cutoff
+        cutoff_date = datetime.utcnow() - timedelta(days=days_back)
+        after_date_str = cutoff_date.strftime("%Y-%m-%d")
 
         # Build modifiers once
         geo_mods = self._build_geo_modifiers(location=location, countries=countries)
@@ -261,7 +267,7 @@ class DorkQueryBuilder:
                 # Best for platforms where job title is in the page title
                 for kv in kw_variants[:1]:  # top 1 variant only to keep query counts low
                     for geo_str in geo_mods:
-                        q = f'{site_pattern} intitle:{phrase(kv)} {geo_str}'.strip()
+                        q = f'{site_pattern} intitle:{phrase(kv)} {geo_str} after:{after_date_str}'.strip()
                         queries.append({
                             "query":    q,
                             "keyword":  keyword,
@@ -274,7 +280,7 @@ class DorkQueryBuilder:
                 # the job title appears in the URL slug
                 if any(p in site_key for p in ["greenhouse", "lever", "workable", "ashby"]):
                     slug = keyword.lower().replace(" ", "-")
-                    q = f'{site_pattern} inurl:{slug}'.strip()
+                    q = f'{site_pattern} inurl:{slug} after:{after_date_str}'.strip()
                     queries.append({
                         "query":    q,
                         "keyword":  keyword,
@@ -287,7 +293,7 @@ class DorkQueryBuilder:
                 extra = (type_mods[:1] + exp_mods[:1])
                 extra_str = " ".join(extra)
                 for geo_str in geo_mods:
-                    q = f'{site_pattern} {phrase(keyword)} {geo_str} {extra_str}'.strip()
+                    q = f'{site_pattern} {phrase(keyword)} {geo_str} {extra_str} after:{after_date_str}'.strip()
                     queries.append({
                         "query":    q,
                         "keyword":  keyword,
@@ -301,7 +307,7 @@ class DorkQueryBuilder:
         for keyword in keywords[:3]:  # top 3 keywords only
             kv = f'"{keyword}"'
             for geo_str in geo_mods:
-                q = f'{kv} {geo_str} job posting "apply now"'.strip()
+                q = f'{kv} {geo_str} job posting "apply now" after:{after_date_str}'.strip()
                 queries.append({
                     "query":    q,
                     "keyword":  keyword,

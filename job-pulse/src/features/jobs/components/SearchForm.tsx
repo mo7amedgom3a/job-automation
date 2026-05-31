@@ -95,11 +95,11 @@ export function SearchForm({ value, onChange, onSubmit, loading }: Props) {
               </button>
             ))}
           </div>
-          {value.workType === "onsite" && (
+          {(value.workType === "onsite" || value.workType === "remote") && (
             <input
               className="jd-input"
               style={{ marginTop: 10 }}
-              placeholder="City (e.g. Cairo)"
+              placeholder={value.workType === "remote" ? "City (optional, e.g. Cairo)" : "City (e.g. Cairo)"}
               value={value.onsiteCity}
               onChange={(e) => onChange({ onsiteCity: e.target.value })}
             />

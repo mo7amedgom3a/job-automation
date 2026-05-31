@@ -284,15 +284,22 @@ class JobResultParser:
         # Remote first
         if re.search(r'\b(remote|work from home|fully remote|wfh)\b', text, re.I):
             return "Remote"
+        
+        is_hybrid = bool(re.search(r'\b(hybrid|hybrid remote|hybrid work)\b', text, re.I))
+        
         # Explicit location tag
         m = re.search(r'location[:\s]+([^\n,|]{3,40})', text, re.I)
         if m:
-            return m.group(1).strip()
+            loc = m.group(1).strip()
+            return f"Hybrid - {loc}" if is_hybrid else loc
+            
         # City, Country / City, State patterns
         m = re.search(r'\b([A-Z][a-z]+(?:\s[A-Z][a-z]+)?,\s*[A-Z]{2,})\b', text)
         if m:
-            return m.group(1)
-        return "Not specified"
+            loc = m.group(1)
+            return f"Hybrid - {loc}" if is_hybrid else loc
+            
+        return "Hybrid" if is_hybrid else "Not specified"
 
     def _extract_posted_at(self, raw: dict, title: str, body: str) -> str:
         """Extract a posting timestamp from DDG metadata or snippet text."""

@@ -25,6 +25,7 @@ export interface FormState {
 export interface SearchPayload {
   keywords: string[];
   job_sites: string[];
+  work_type: string | null;
   location: string | null;
   countries: string[];
   job_type: string | null;
