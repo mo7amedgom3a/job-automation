@@ -109,6 +109,15 @@ export function JobDorkApp() {
     };
 
     return results.filter((r) => {
+      const blacklist = [
+        "crossing hurdles", "turing", "confidential", "confidential careers",
+        "micro1", "canonical", "naphora games group", "meridial marketplace",
+        "by invisible", "invisible", "siira", "proxify", "dataannotation",
+        "mindrift", "mercor", "Jobgether"
+      ];
+      const compLower = (r.company || "").toLowerCase().trim();
+      if (blacklist.some((scam) => compLower.includes(scam))) return false;
+
       if (form.strictCountry && form.countries.length > 0) {
         const loc = (r.location || "").toLowerCase();
         const compAddr = (r.company_addresses || "").toLowerCase();

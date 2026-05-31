@@ -229,10 +229,24 @@ async def search_jobs(req: SearchRequest) -> SearchResponse:
     # 4. Parse each result into a structured job
     parsed = parser.parse_many(raw_results)
 
-    # 5. Deduplicate against seen URLs
+    # 5. Deduplicate against seen URLs and filter out blacklisted scam companies
     jobs = []
     skipped = 0
+    blacklist = [
+        "crossing hurdles", "turing", "confidential", "confidential careers",
+        "micro1", "canonical", "naphora games group", "meridial marketplace",
+        "by invisible", "invisible", "siira", "proxify", "dataannotation",
+        "mindrift", "mercor", "Jobgether"
+    ]
+    def is_scam(company_name: str) -> bool:
+        if not company_name:
+            return False
+        name_lower = company_name.lower().strip()
+        return any(scam in name_lower for scam in blacklist)
+
     for job in parsed:
+        if is_scam(job.get("company")):
+            continue
         if cache.is_seen(job["url"]):
             skipped += 1
             continue

@@ -126,6 +126,25 @@ class JobOrchestrator:
             results["google"] = google_res
         else:
             logger.error(f"Orchestrator: Google search failed: {google_res}")
+        # Filter out blacklisted scam and confidential companies
+        blacklist = [
+            "crossing hurdles", "turing", "confidential", "confidential careers",
+            "micro1", "canonical", "naphora games group", "meridial marketplace",
+            "by invisible", "invisible", "siira", "proxify", "dataannotation",
+            "mindrift", "mercor", "Jobgether"
+        ]
+        
+        def is_scam(company_name: str) -> bool:
+            if not company_name:
+                return False
+            name_lower = company_name.lower().strip()
+            return any(scam in name_lower for scam in blacklist)
+
+        for source in ["linkedin", "indeed", "google"]:
+            results[source] = [
+                job for job in results[source]
+                if not is_scam(job.get("company"))
+            ]
             
         return results
 
