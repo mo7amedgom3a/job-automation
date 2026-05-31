@@ -68,56 +68,65 @@ class JobOrchestrator:
             "google": []
         }
 
-        # Concurrently launch isolated searches
-        tasks = []
+        # Determine the countries we will search for LinkedIn remote jobs
+        linkedin_countries = ["Saudi Arabia", "United Arab Emirates", "Qatar", "Egypt", "Kuwait"] if is_remote else [primary_country]
         
-        # 1. Isolated LinkedIn JobSpy Search
-        tasks.append(self._search_linkedin_jobspy(
+        linkedin_tasks = [
+            self._search_linkedin_jobspy(
+                keywords=keywords,
+                location=location_val,
+                is_remote=is_remote,
+                country=c,
+                max_results=req.max_results,
+                hours_old=24 if req.recent_hours == 24 else 72
+            )
+            for c in linkedin_countries
+        ]
+        
+        indeed_task = self._search_indeed_jobspy(
             keywords=keywords,
             location=location_val,
             is_remote=is_remote,
             country=primary_country,
             max_results=req.max_results,
             hours_old=24 if req.recent_hours == 24 else 72
-        ))
-
-        # 2. Isolated Indeed JobSpy Search
-        tasks.append(self._search_indeed_jobspy(
-            keywords=keywords,
-            location=location_val,
-            is_remote=is_remote,
-            country=primary_country,
-            max_results=req.max_results,
-            hours_old=24 if req.recent_hours == 24 else 72
-        ))
-
-        # 3. Google Search API (using dork templates with 24h filter)
-        tasks.append(self._search_google_dork(
+        )
+        
+        google_task = self._search_google_dork(
             keywords=keywords,
             sites=req.job_sites,
-            location="remote" if is_remote else location_val,
+            location="remote",
             max_results=req.max_results
-        ))
-
-        # Wait for all tasks to complete
-        task_results = await asyncio.gather(*tasks, return_exceptions=True)
-
-        # Parse task responses
-        if not isinstance(task_results[0], Exception):
-            results["linkedin"] = task_results[0]
+        )
+        
+        # Concurrently launch all tasks
+        all_tasks = [*linkedin_tasks, indeed_task, google_task]
+        task_results = await asyncio.gather(*all_tasks, return_exceptions=True)
+        
+        # Parse and aggregate LinkedIn results
+        linkedin_results = []
+        for i in range(len(linkedin_countries)):
+            res = task_results[i]
+            if not isinstance(res, Exception):
+                linkedin_results.extend(res)
+            else:
+                logger.error(f"Orchestrator: LinkedIn search failed for {linkedin_countries[i]}: {res}")
+        results["linkedin"] = linkedin_results
+        
+        # Parse Indeed result
+        indeed_res = task_results[-2]
+        if not isinstance(indeed_res, Exception):
+            results["indeed"] = indeed_res
         else:
-            logger.error(f"Orchestrator: LinkedIn search failed: {task_results[0]}")
-
-        if not isinstance(task_results[1], Exception):
-            results["indeed"] = task_results[1]
+            logger.error(f"Orchestrator: Indeed search failed: {indeed_res}")
+            
+        # Parse Google result
+        google_res = task_results[-1]
+        if not isinstance(google_res, Exception):
+            results["google"] = google_res
         else:
-            logger.error(f"Orchestrator: Indeed search failed: {task_results[1]}")
-
-        if not isinstance(task_results[2], Exception):
-            results["google"] = task_results[2]
-        else:
-            logger.error(f"Orchestrator: Google search failed: {task_results[2]}")
-
+            logger.error(f"Orchestrator: Google search failed: {google_res}")
+            
         return results
 
     async def _search_linkedin_jobspy(
@@ -142,7 +151,7 @@ class JobOrchestrator:
             }
             if is_remote:
                 params["is_remote"] = True
-                params["location"] = country if (not location or location == "remote") else location
+                params["location"] = country
                 params["location_linkedin"] = country
             else:
                 params["location"] = location

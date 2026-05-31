@@ -12,10 +12,10 @@ search_term = [f'"{job_type}"' for job_type in job_types]
 linkedin_scraper = scrape_jobs(
     site_name=["linkedin"],
     search_term="'software engineer' OR backend OR 'Full Stack' OR python OR DevOps OR Cloud",
-    location="Cairo",
+    location="Cairo, Egypt",
     is_remote=True,
     results_wanted=100,
-    location_linkedin="Egypt",
+    location_linkedin="Cairo",
     hours_old=170,
 )
 
