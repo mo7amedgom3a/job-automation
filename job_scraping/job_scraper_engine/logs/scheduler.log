@@ -1,0 +1,207 @@
+[2026-06-01 02:02:21] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 02:02:21] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=remoteok
+[2026-06-01 02:02:21] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-05-31 23:02 UTC | 1 site(s) ═══
+[2026-06-01 02:02:21] INFO     job_scraper.scheduler: ▶  Starting spider: remoteok
+[2026-06-01 02:02:27] INFO     job_scraper.scheduler: ✔  Spider remoteok finished in 5.4s | requests=1 | items=0 | blocked=1
+[2026-06-01 02:02:27] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 02:02:27] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 02:08:23] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 02:08:23] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=remoteok
+[2026-06-01 02:08:23] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-05-31 23:08 UTC | 1 site(s) ═══
+[2026-06-01 02:08:23] INFO     job_scraper.scheduler: ▶  Starting spider: remoteok
+[2026-06-01 02:08:30] INFO     job_scraper.scheduler: ✔  Spider remoteok finished in 6.6s | requests=1 | items=0 | blocked=1
+[2026-06-01 02:08:30] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 02:08:30] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 02:13:30] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 02:13:30] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=remoteok
+[2026-06-01 02:13:30] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-05-31 23:13 UTC | 1 site(s) ═══
+[2026-06-01 02:13:30] INFO     job_scraper.scheduler: ▶  Starting spider: remoteok
+[2026-06-01 02:13:35] INFO     job_scraper.scheduler: ✔  Spider remoteok finished in 5.2s | requests=1 | items=0 | blocked=1
+[2026-06-01 02:13:35] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 02:13:35] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 02:17:49] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 02:17:49] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=remoteok
+[2026-06-01 02:17:49] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-05-31 23:17 UTC | 1 site(s) ═══
+[2026-06-01 02:17:49] INFO     job_scraper.scheduler: ▶  Starting spider: remoteok
+[2026-06-01 02:17:57] INFO     job_scraper.scheduler: ✔  Spider remoteok finished in 8.1s | requests=1 | items=0 | blocked=1
+[2026-06-01 02:17:57] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 02:17:57] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 02:19:32] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 02:19:32] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=remoteok
+[2026-06-01 02:19:32] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-05-31 23:19 UTC | 1 site(s) ═══
+[2026-06-01 02:19:32] INFO     job_scraper.scheduler: ▶  Starting spider: remoteok
+[2026-06-01 02:20:42] INFO     job_scraper.scheduler: ✔  Spider remoteok finished in 69.8s | requests=4 | items=0 | blocked=4
+[2026-06-01 02:20:42] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 02:20:42] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 02:22:46] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 02:22:46] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=remoteok
+[2026-06-01 02:22:46] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-05-31 23:22 UTC | 1 site(s) ═══
+[2026-06-01 02:22:46] INFO     job_scraper.scheduler: ▶  Starting spider: remoteok
+[2026-06-01 02:23:43] INFO     job_scraper.scheduler: ✔  Spider remoteok finished in 56.8s | requests=4 | items=0 | blocked=4
+[2026-06-01 02:23:43] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 02:23:43] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 02:30:39] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 02:30:39] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=weworkremotely
+[2026-06-01 02:30:39] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-05-31 23:30 UTC | 1 site(s) ═══
+[2026-06-01 02:30:39] INFO     job_scraper.scheduler: ▶  Starting spider: weworkremotely
+[2026-06-01 02:33:58] INFO     job_scraper.scheduler: ✔  Spider weworkremotely finished in 198.5s | requests=2 | items=0 | blocked=2
+[2026-06-01 02:33:58] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 02:33:58] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 02:41:39] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 02:41:39] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=weworkremotely
+[2026-06-01 02:41:39] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-05-31 23:41 UTC | 1 site(s) ═══
+[2026-06-01 02:41:39] INFO     job_scraper.scheduler: ▶  Starting spider: weworkremotely
+[2026-06-01 02:41:46] INFO     job_scraper.scheduler: ✔  Spider weworkremotely finished in 7.7s | requests=2 | items=0 | blocked=0
+[2026-06-01 02:41:46] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 02:41:46] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 02:48:37] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 02:48:37] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=weworkremotely
+[2026-06-01 02:48:37] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-05-31 23:48 UTC | 1 site(s) ═══
+[2026-06-01 02:48:37] INFO     job_scraper.scheduler: ▶  Starting spider: weworkremotely
+[2026-06-01 02:48:46] INFO     job_scraper.scheduler: ✔  Spider weworkremotely finished in 8.7s | requests=2 | items=58 | blocked=0
+[2026-06-01 02:48:46] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 58 ═══
+[2026-06-01 02:48:46] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 02:50:11] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 02:50:11] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=remoteok
+[2026-06-01 02:50:11] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-05-31 23:50 UTC | 1 site(s) ═══
+[2026-06-01 02:50:11] INFO     job_scraper.scheduler: ▶  Starting spider: remoteok
+[2026-06-01 02:50:14] INFO     job_scraper.scheduler: ✔  Spider remoteok finished in 3.1s | requests=1 | items=0 | blocked=0
+[2026-06-01 02:50:14] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 02:50:14] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 02:55:15] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 02:55:15] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=remoteok
+[2026-06-01 02:55:15] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-05-31 23:55 UTC | 1 site(s) ═══
+[2026-06-01 02:55:15] INFO     job_scraper.scheduler: ▶  Starting spider: remoteok
+[2026-06-01 02:55:56] INFO     job_scraper.scheduler: ✔  Spider remoteok finished in 42.9s | requests=1 | items=50 | blocked=0
+[2026-06-01 02:55:56] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 50 ═══
+[2026-06-01 02:55:56] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 02:58:57] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 02:58:57] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=remoteok
+[2026-06-01 02:58:57] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-05-31 23:58 UTC | 1 site(s) ═══
+[2026-06-01 02:58:57] INFO     job_scraper.scheduler: ▶  Starting spider: remoteok
+[2026-06-01 02:59:13] INFO     job_scraper.scheduler: ✔  Spider remoteok finished in 16.3s | requests=1 | items=0 | blocked=0
+[2026-06-01 02:59:13] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 02:59:13] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 03:00:02] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 03:00:02] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=jobicy
+[2026-06-01 03:00:02] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-01 00:00 UTC | 1 site(s) ═══
+[2026-06-01 03:00:02] INFO     job_scraper.scheduler: ▶  Starting spider: jobicy
+[2026-06-01 03:03:21] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 03:03:21] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=jobicy
+[2026-06-01 03:03:21] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-01 00:03 UTC | 1 site(s) ═══
+[2026-06-01 03:03:21] INFO     job_scraper.scheduler: ▶  Starting spider: jobicy
+[2026-06-01 03:07:24] INFO     job_scraper.scheduler: ✔  Spider jobicy finished in 243.1s | requests=3 | items=0 | blocked=2
+[2026-06-01 03:07:24] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 03:07:24] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 03:18:38] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 03:18:38] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=jobicy
+[2026-06-01 03:18:38] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-01 00:18 UTC | 1 site(s) ═══
+[2026-06-01 03:18:38] INFO     job_scraper.scheduler: ▶  Starting spider: jobicy
+[2026-06-01 03:20:02] INFO     job_scraper.scheduler: ✔  Spider jobicy finished in 84.2s | requests=1 | items=100 | blocked=0
+[2026-06-01 03:20:02] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 100 ═══
+[2026-06-01 03:20:02] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 03:21:01] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 03:21:01] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=remotive
+[2026-06-01 03:21:01] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-01 00:21 UTC | 1 site(s) ═══
+[2026-06-01 03:21:01] INFO     job_scraper.scheduler: ▶  Starting spider: remotive
+[2026-06-01 03:22:33] INFO     job_scraper.scheduler: ✔  Spider remotive finished in 92.5s | requests=1 | items=0 | blocked=0
+[2026-06-01 03:22:33] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 03:22:33] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 03:34:40] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 03:34:40] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=remotive
+[2026-06-01 03:34:40] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-01 00:34 UTC | 1 site(s) ═══
+[2026-06-01 03:34:40] INFO     job_scraper.scheduler: ▶  Starting spider: remotive
+[2026-06-01 03:34:43] INFO     job_scraper.scheduler: ✔  Spider remotive finished in 2.9s | requests=0 | items=0 | blocked=0
+[2026-06-01 03:34:43] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 03:34:43] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 03:36:26] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 03:36:26] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=remotive
+[2026-06-01 03:36:26] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-01 00:36 UTC | 1 site(s) ═══
+[2026-06-01 03:36:26] INFO     job_scraper.scheduler: ▶  Starting spider: remotive
+[2026-06-01 03:37:16] INFO     job_scraper.scheduler: ✔  Spider remotive finished in 49.6s | requests=4 | items=0 | blocked=4
+[2026-06-01 03:37:16] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 03:37:16] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 03:42:47] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 03:42:47] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=remotive
+[2026-06-01 03:42:47] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-01 00:42 UTC | 1 site(s) ═══
+[2026-06-01 03:42:47] INFO     job_scraper.scheduler: ▶  Starting spider: remotive
+[2026-06-01 03:43:04] INFO     job_scraper.scheduler: ✔  Spider remotive finished in 16.7s | requests=1 | items=19 | blocked=0
+[2026-06-01 03:43:04] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 19 ═══
+[2026-06-01 03:43:04] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 03:45:04] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 03:45:04] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=himalayas
+[2026-06-01 03:45:04] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-01 00:45 UTC | 1 site(s) ═══
+[2026-06-01 03:45:04] INFO     job_scraper.scheduler: ▶  Starting spider: himalayas
+[2026-06-01 03:49:16] INFO     job_scraper.scheduler: ✔  Spider himalayas finished in 252.9s | requests=1 | items=0 | blocked=0
+[2026-06-01 03:49:16] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 03:49:16] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 04:15:30] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 04:15:30] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=himalayas
+[2026-06-01 04:15:30] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-01 01:15 UTC | 1 site(s) ═══
+[2026-06-01 04:15:30] INFO     job_scraper.scheduler: ▶  Starting spider: himalayas
+[2026-06-01 04:15:36] INFO     job_scraper.scheduler: ✔  Spider himalayas finished in 5.4s | requests=1 | items=20 | blocked=0
+[2026-06-01 04:15:36] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 20 ═══
+[2026-06-01 04:15:36] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 04:32:52] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 04:32:52] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=trueup
+[2026-06-01 04:32:52] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-01 01:32 UTC | 1 site(s) ═══
+[2026-06-01 04:32:52] INFO     job_scraper.scheduler: ▶  Starting spider: trueup
+[2026-06-01 04:33:23] INFO     job_scraper.scheduler: ✔  Spider trueup finished in 31.0s | requests=1 | items=0 | blocked=0
+[2026-06-01 04:33:23] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 04:33:23] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 04:34:14] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 04:34:14] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=trueup
+[2026-06-01 04:34:14] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-01 01:34 UTC | 1 site(s) ═══
+[2026-06-01 04:34:14] INFO     job_scraper.scheduler: ▶  Starting spider: trueup
+[2026-06-01 04:34:45] INFO     job_scraper.scheduler: ✔  Spider trueup finished in 30.6s | requests=1 | items=0 | blocked=0
+[2026-06-01 04:34:45] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 04:34:45] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 04:35:34] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 04:35:34] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=trueup
+[2026-06-01 04:35:34] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-01 01:35 UTC | 1 site(s) ═══
+[2026-06-01 04:35:34] INFO     job_scraper.scheduler: ▶  Starting spider: trueup
+[2026-06-01 04:36:04] INFO     job_scraper.scheduler: ✔  Spider trueup finished in 29.5s | requests=1 | items=0 | blocked=0
+[2026-06-01 04:36:04] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 04:36:04] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 04:37:55] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 04:37:55] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=trueup
+[2026-06-01 04:37:55] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-01 01:37 UTC | 1 site(s) ═══
+[2026-06-01 04:37:55] INFO     job_scraper.scheduler: ▶  Starting spider: trueup
+[2026-06-01 04:38:28] INFO     job_scraper.scheduler: ✔  Spider trueup finished in 33.2s | requests=1 | items=15 | blocked=0
+[2026-06-01 04:38:28] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 15 ═══
+[2026-06-01 04:38:28] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 04:43:13] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 04:43:13] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=trueup
+[2026-06-01 04:43:13] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-01 01:43 UTC | 1 site(s) ═══
+[2026-06-01 04:43:13] INFO     job_scraper.scheduler: ▶  Starting spider: trueup
+[2026-06-01 04:43:46] INFO     job_scraper.scheduler: ✔  Spider trueup finished in 33.1s | requests=1 | items=0 | blocked=0
+[2026-06-01 04:43:46] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 04:43:46] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 04:45:53] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 04:45:53] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=trueup
+[2026-06-01 04:45:53] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-01 01:45 UTC | 1 site(s) ═══
+[2026-06-01 04:45:53] INFO     job_scraper.scheduler: ▶  Starting spider: trueup
+[2026-06-01 04:46:36] INFO     job_scraper.scheduler: ✔  Spider trueup finished in 42.9s | requests=1 | items=0 | blocked=0
+[2026-06-01 04:46:36] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 04:46:36] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 14:22:06] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 14:22:06] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=linkedin
+[2026-06-01 14:22:06] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-01 11:22 UTC | 1 site(s) ═══
+[2026-06-01 14:22:06] INFO     job_scraper.scheduler: ▶  Starting spider: linkedin
+[2026-06-01 14:22:07] INFO     job_scraper.scheduler: ✔  Spider linkedin finished in 0.9s | requests=0 | items=0 | blocked=0
+[2026-06-01 14:22:07] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-01 14:22:07] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 14:22:34] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 14:22:34] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=linkedin
+[2026-06-01 14:22:34] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-01 11:22 UTC | 1 site(s) ═══
+[2026-06-01 14:22:34] INFO     job_scraper.scheduler: ▶  Starting spider: linkedin
+[2026-06-01 14:24:56] INFO     job_scraper.scheduler: ✔  Spider linkedin finished in 141.2s | requests=1 | items=13 | blocked=0
+[2026-06-01 14:24:56] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 13 ═══
+[2026-06-01 14:24:56] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 14:45:01] INFO     job_scraper.storage: Database initialised at jobs.db
+[2026-06-01 14:45:01] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=indeed
+[2026-06-01 14:45:01] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-01 11:45 UTC | 1 site(s) ═══
+[2026-06-01 14:45:01] INFO     job_scraper.scheduler: ▶  Starting spider: indeed
+[2026-06-01 14:47:48] INFO     job_scraper.scheduler: ✔  Spider indeed finished in 167.6s | requests=2 | items=16 | blocked=0
+[2026-06-01 14:47:48] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 16 ═══
+[2026-06-01 14:47:48] INFO     job_scraper.scheduler: --once flag set. Exiting.

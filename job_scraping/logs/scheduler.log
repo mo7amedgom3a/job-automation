@@ -1,0 +1,14 @@
+[2026-06-01 16:16:40] INFO     job_scraper.storage: Database initialised at /home/mohamed/job-automation/job_scraping/job_scraper_engine/jobs.db
+[2026-06-01 16:16:40] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=jobicy
+[2026-06-01 16:16:40] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-01 13:16 UTC | 1 site(s) ═══
+[2026-06-01 16:16:40] INFO     job_scraper.scheduler: ▶  Starting spider: jobicy
+[2026-06-01 16:16:48] INFO     job_scraper.scheduler: ✔  Spider jobicy finished in 7.9s | requests=1 | items=8 | blocked=0
+[2026-06-01 16:16:48] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 8 ═══
+[2026-06-01 16:16:48] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-01 16:38:12] INFO     job_scraper.storage: Database initialised at /home/mohamed/job-automation/job_scraping/job_scraper_engine/jobs.db
+[2026-06-01 16:38:12] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=linkedin_eg
+[2026-06-01 16:38:12] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-01 13:38 UTC | 1 site(s) ═══
+[2026-06-01 16:38:12] INFO     job_scraper.scheduler: ▶  Starting spider: linkedin_eg
+[2026-06-01 16:40:35] INFO     job_scraper.scheduler: ✔  Spider linkedin_eg finished in 143.1s | requests=1 | items=59 | blocked=0
+[2026-06-01 16:40:35] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 59 ═══
+[2026-06-01 16:40:35] INFO     job_scraper.scheduler: --once flag set. Exiting.
