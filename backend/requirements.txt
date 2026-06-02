@@ -6,6 +6,7 @@ python-dotenv==1.2.2
 pandas==2.2.3
 psycopg[binary]==3.2.9
 redis==5.2.1
-scrapling[all]
+scrapling[spiders]
+scrapling[fetchers]
 uvloop; sys_platform != "win32"
 playwright
