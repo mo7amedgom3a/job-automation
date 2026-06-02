@@ -9,9 +9,7 @@ logger = logging.getLogger(__name__)
 _ENGINE_CLASS_MAP = {
     "duckduckgo": "scraper_api.ddg_search_engine.DuckDuckGoSearcher",
     "ddg": "scraper_api.ddg_search_engine.DuckDuckGoSearcher",
-    "yahoo": "scraper_api.yahoo_search_engine.YahooSearchEngine",
-    "jobspy": "scraper_api.jobspy_search_engine.JobSpySearcher",
-    "python-jobspy": "scraper_api.jobspy_search_engine.JobSpySearcher",
+    "yahoo": "scraper_api.yahoo_search_engine.YahooEngine",
     "google_api": "scraper_api.google_api_search_engine.GoogleApiSearcher",
 }
 
@@ -73,15 +71,6 @@ except (ImportError, SystemError) as exc:  # pragma: no cover
         logger.warning("Failed to import GoogleApiSearcher: %s; fallback failed: %s", exc, exc2)
 
 try:
-    from .jobspy_search_engine import JobSpySearcher
-except (ImportError, SystemError) as exc:  # pragma: no cover
-    try:
-        from jobspy_search_engine import JobSpySearcher
-    except ImportError as exc2:
-        JobSpySearcher = None
-        logger.warning("Failed to import JobSpySearcher: %s; fallback failed: %s", exc, exc2)
-
-try:
     from .yahoo_search_engine import YahooSearchEngine
 except (ImportError, SystemError) as exc:  # pragma: no cover
     try:
@@ -96,6 +85,5 @@ __all__ = [
     "load_search_engine",
     "DuckDuckGoSearcher",
     "GoogleApiSearcher",
-    "JobSpySearcher",
     "YahooSearchEngine",
 ]

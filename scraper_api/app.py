@@ -1,8 +1,6 @@
 """
-Job Dork Search Service.
-
-FastAPI service that builds advanced job dorks, searches DuckDuckGo, parses the
-results into normalized jobs, and returns a compact response for n8n.
+Job Dork and Scraper Aggregator Service.
+FastAPI application to manage parallel custom spiders, dorks, and Google API searches.
 """
 
 from __future__ import annotations
@@ -10,9 +8,9 @@ from __future__ import annotations
 import logging
 import time
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Any, Dict, List, Optional
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -20,20 +18,22 @@ try:
     from scraper_api.cache import DeduplicationCache
     from scraper_api.dork_builder import DorkQueryBuilder
     from scraper_api.parser import JobResultParser
-    from scraper_api.searcher import DuckDuckGoSearcher, JobSpySearcher, GoogleApiSearcher
-except ModuleNotFoundError:  # pragma: no cover - local script fallback
+    from scraper_api.searcher import DuckDuckGoSearcher, GoogleApiSearcher
+    from scraper_api.orchestrator import JobOrchestrator
+except ModuleNotFoundError:
     from cache import DeduplicationCache
     from dork_builder import DorkQueryBuilder
     from parser import JobResultParser
-    from searcher import DuckDuckGoSearcher, JobSpySearcher, GoogleApiSearcher
+    from searcher import DuckDuckGoSearcher, GoogleApiSearcher
+    from orchestrator import JobOrchestrator
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("job-dork-api")
 
 app = FastAPI(
-    title="Job Dork Search Service",
-    description="Advanced job dork search via DuckDuckGo for n8n automation.",
-    version="3.0.0",
+    title="Job Aggregator Service",
+    description="Unified API aggregating Google Dorks and custom concurrent Playwright spiders.",
+    version="3.1.0",
 )
 
 app.add_middleware(
@@ -43,14 +43,40 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-dork_builder = DorkQueryBuilder()
-searcher = DuckDuckGoSearcher()
-parser = JobResultParser()
-cache = DeduplicationCache()
-jobspy_searcher = JobSpySearcher()
-google_searcher = GoogleApiSearcher()
+# ── Shared Singletons ───────────────────────────────────────────────────────
+_dork_builder = DorkQueryBuilder()
+_searcher = DuckDuckGoSearcher()
+_parser = JobResultParser()
+_cache = DeduplicationCache()
+_google_searcher = GoogleApiSearcher()
 
 
+# ── Dependency Injection Providers ──────────────────────────────────────────
+def get_dork_builder() -> DorkQueryBuilder:
+    return _dork_builder
+
+
+def get_searcher() -> DuckDuckGoSearcher:
+    return _searcher
+
+
+def get_parser() -> JobResultParser:
+    return _parser
+
+
+def get_cache() -> DeduplicationCache:
+    return _cache
+
+
+def get_google_searcher() -> GoogleApiSearcher:
+    return _google_searcher
+
+
+def get_orchestrator() -> JobOrchestrator:
+    return JobOrchestrator()
+
+
+# ── Request / Response Models ───────────────────────────────────────────────
 class SearchRequest(BaseModel):
     keywords: list[str] = Field(
         default_factory=lambda: [
@@ -77,32 +103,32 @@ class SearchRequest(BaseModel):
             "jobicy.com",
         ]
     )
-    work_type: str | None = None
-    location: str | None = "remote"
+    work_type: Optional[str] = None
+    location: Optional[str] = "remote"
     countries: list[str] = Field(
         default_factory=lambda: ["egypt", "Middle East", "eu", "usa", "canada", "Germany", "france", "uk"]
     )
-    job_type: str | None = None
-    experience: str | None = None
+    job_type: Optional[str] = None
+    experience: Optional[str] = None
     max_results: int = Field(default=50, ge=1, le=200)
     days_back: int = Field(default=1, ge=1, le=60)
-    recent_hours: int | None = Field(default=24, ge=1, le=24 * 60)
+    recent_hours: Optional[int] = Field(default=24, ge=1, le=24 * 60)
     posted_today: bool = False
     strict_recent: bool = True
     sort_by_posted_at: bool = True
     reset_cache: bool = False
 
-    # JobSpy specific parameters
-    easy_apply: bool | None = None
+    # Dynamic search overrides
+    easy_apply: Optional[bool] = None
     strict_country: bool = False
     linkedin_fetch_description: bool = False
-    linkedin_company_ids: list[int] | None = None
-    google_search_term: str | None = None
-    distance: int | None = None
-    proxies: list[str] | None = None
-    enforce_annual_salary: bool | None = None
-    user_agent: str | None = None
-    ca_cert: str | None = None
+    linkedin_company_ids: Optional[list[int]] = None
+    google_search_term: Optional[str] = None
+    distance: Optional[int] = None
+    proxies: Optional[list[str]] = None
+    enforce_annual_salary: Optional[bool] = None
+    user_agent: Optional[str] = None
+    ca_cert: Optional[str] = None
     description_format: str = "markdown"
 
 
@@ -136,15 +162,7 @@ class SearchResponse(BaseModel):
     timestamp: str
 
 
-@app.get("/health")
-async def health() -> dict[str, str]:
-    return {
-        "status": "ok",
-        "service": "job-dork-search",
-        "time": datetime.utcnow().isoformat(),
-    }
-
-
+# ── Helpers ─────────────────────────────────────────────────────────────────
 def is_within_24_hours(date_str: str, snippet: str = "") -> bool:
     import re
     if not date_str:
@@ -152,7 +170,6 @@ def is_within_24_hours(date_str: str, snippet: str = "") -> bool:
     else:
         text_to_check = date_str.lower()
         
-    # Positive indicators (definitely within 24 hours)
     if any(k in text_to_check for k in ["hour", "minute", "min", "second", "just now"]):
         match = re.search(r'(\d+)\s+hours?\s+ago', text_to_check)
         if match:
@@ -160,11 +177,9 @@ def is_within_24_hours(date_str: str, snippet: str = "") -> bool:
             return hours <= 24
         return True
         
-    # Negative indicators (definitely older than 24 hours)
     if any(k in text_to_check for k in ["day", "week", "month", "year", "yesterday"]):
         return False
         
-    # Calendar dates
     months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
     if any(m in text_to_check for m in months):
         return False
@@ -172,12 +187,26 @@ def is_within_24_hours(date_str: str, snippet: str = "") -> bool:
     return True
 
 
+# ── Endpoints ───────────────────────────────────────────────────────────────
+@app.get("/health")
+async def health() -> dict[str, str]:
+    return {
+        "status": "ok",
+        "service": "job-aggregator-service",
+        "time": datetime.utcnow().isoformat(),
+    }
+
+
 @app.post("/search", response_model=SearchResponse)
-async def search_jobs(req: SearchRequest) -> SearchResponse:
+async def search_jobs(
+    req: SearchRequest,
+    dork_builder: DorkQueryBuilder = Depends(get_dork_builder),
+    google_searcher: GoogleApiSearcher = Depends(get_google_searcher),
+    parser: JobResultParser = Depends(get_parser),
+    cache: DeduplicationCache = Depends(get_cache),
+) -> SearchResponse:
     """
-    Main endpoint — n8n calls this every 6 hours.
-    Builds customized dork template queries → searches Google via Serper/SerpApi →
-    filters results strictly within 24 hours → parses → deduplicates → returns.
+    Dork template query searcher via Google API.
     """
     start = time.time()
 
@@ -185,7 +214,6 @@ async def search_jobs(req: SearchRequest) -> SearchResponse:
         cache.clear()
         logger.info("Cache cleared by request")
 
-    # 1. Build dork template queries (exactly one query per board/site requested)
     queries = dork_builder.build_template_queries(
         keywords=req.keywords,
         sites=req.job_sites,
@@ -193,7 +221,6 @@ async def search_jobs(req: SearchRequest) -> SearchResponse:
     )
     logger.info(f"Built {len(queries)} template-based dork queries")
 
-    # 2. Search all queries concurrently via Google API Searcher (with 24h filter)
     import asyncio
     tasks = [
         google_searcher.search(q["query"], max_results=20)
@@ -206,7 +233,6 @@ async def search_jobs(req: SearchRequest) -> SearchResponse:
         if isinstance(res, Exception):
             logger.warning(f"Google API search failed for query: {q['query'][:60]} — {res}")
             continue
-        # Enrich raw results with metadata needed by the parser
         for r in res:
             r["_dork_query"] = q["query"]
             r["_dork_keyword"] = q["keyword"]
@@ -215,7 +241,6 @@ async def search_jobs(req: SearchRequest) -> SearchResponse:
         raw_results.extend(res)
     logger.info(f"Google API Search: Got {len(raw_results)} total raw results")
 
-    # 3. Post-filter results strictly within the past 24 hours
     filtered_raw_results = []
     discarded_count = 0
     for r in raw_results:
@@ -226,18 +251,17 @@ async def search_jobs(req: SearchRequest) -> SearchResponse:
     logger.info(f"Date post-filter: Retained {len(filtered_raw_results)} / {len(raw_results)} results (discarded {discarded_count} older than 24 hours)")
     raw_results = filtered_raw_results
 
-    # 4. Parse each result into a structured job
     parsed = parser.parse_many(raw_results)
 
-    # 5. Deduplicate against seen URLs and filter out blacklisted scam companies
     jobs = []
     skipped = 0
     blacklist = [
         "crossing hurdles", "turing", "confidential", "confidential careers",
         "micro1", "canonical", "naphora games group", "meridial marketplace",
         "by invisible", "invisible", "siira", "proxify", "dataannotation",
-        "mindrift", "mercor", "Jobgether"
+        "mindrift", "mercor", "jobgether"
     ]
+    
     def is_scam(company_name: str) -> bool:
         if not company_name:
             return False
@@ -253,7 +277,6 @@ async def search_jobs(req: SearchRequest) -> SearchResponse:
         cache.mark_seen(job["url"])
         jobs.append(job)
 
-    # 6. Sort by relevance score, cap at max_results
     jobs.sort(key=lambda j: j.get("score", 0), reverse=True)
     jobs = jobs[:req.max_results]
 
@@ -273,94 +296,87 @@ async def search_jobs(req: SearchRequest) -> SearchResponse:
 
 
 @app.post("/search/orchestrate", response_model=dict[str, list[dict]])
-async def search_orchestrate(req: SearchRequest) -> dict[str, list[dict]]:
+async def search_orchestrate(
+    req: SearchRequest,
+    orchestrator: JobOrchestrator = Depends(get_orchestrator),
+    cache: DeduplicationCache = Depends(get_cache),
+) -> dict[str, list[dict]]:
     """
-    Orchestrate and aggregate isolated job searches across LinkedIn, Indeed, and Google Search API.
-    Returns a dictionary of results grouped by source.
+    Orchestrate and aggregate isolated job searches concurrently across custom spiders in parallel.
+    Groups results by source (e.g. linkedin, indeed, google).
     """
     logger.info("Received Orchestrated Search request")
-    try:
-        from scraper_api.orchestrator import JobOrchestrator
-    except ModuleNotFoundError:
-        from orchestrator import JobOrchestrator
-        
-    orchestrator = JobOrchestrator()
-    
     if req.reset_cache:
-        orchestrator.cache.clear()
+        cache.clear()
         logger.info("Cache cleared by request")
         
     results = await orchestrator.orchestrate(req)
     return results
 
 
-@app.post("/search/jobspy", response_model=list[dict])
-async def search_jobspy(req: SearchRequest) -> list[dict]:
+@app.post("/search/aggregate", response_model=list[dict])
+async def search_aggregate(
+    req: SearchRequest,
+    orchestrator: JobOrchestrator = Depends(get_orchestrator),
+    cache: DeduplicationCache = Depends(get_cache),
+) -> list[dict]:
     """
-    Scrape jobs concurrently using JobSpy across multiple sites with optimized parameters.
+    Aggregate all jobs from all custom spiders in parallel, presenting a unified,
+    flat list of jobs sorted and filtered strictly to user requirements.
     """
-    logger.info("Received JobSpy search request")
-    
-    # 1. Map job sites to JobSpy expected values
-    site_mapping = {
-        "linkedin.com/jobs": "linkedin",
-        "linkedin": "linkedin",
-        "indeed.com/jobs": "indeed",
-        "indeed": "indeed",
-        "glassdoor.com": "glassdoor",
-        "glassdoor": "glassdoor",
-        "google.com": "google",
-        "google": "google",
-        "ziprecruiter.com": "zip_recruiter",
-        "ziprecruiter": "zip_recruiter",
-        "zip_recruiter": "zip_recruiter",
-    }
-    
-    site_names = []
-    for site in req.job_sites:
-        mapped = site_mapping.get(site.lower().strip())
-        if mapped:
-            site_names.append(mapped)
-            
-    # Default to all key platforms if none specified or matched
-    if not site_names:
-        site_names = ["linkedin", "indeed", "glassdoor", "google", "zip_recruiter"]
+    logger.info("Received flat Aggregated Search request")
+    if req.reset_cache:
+        cache.clear()
+        logger.info("Cache cleared by request")
         
-    # 2. Map location constraints
-    is_remote = (req.location == "remote")
-    location_term = "remote" if is_remote else (req.location or "")
+    results = await orchestrator.orchestrate(req)
     
-    # 3. Map time limits (hours_old)
-    hours_old = 72  # Default to last 3 days
-    if req.recent_hours:
-        hours_old = req.recent_hours
-    elif req.days_back:
-        hours_old = req.days_back * 24
+    # Flatten parallel spider runs into a single list
+    unified_list = []
+    seen_urls = set()
+    
+    for source in ["linkedin", "indeed", "google"]:
+        if source in results:
+            for job in results[source]:
+                url = job.get("url")
+                if url and url not in seen_urls:
+                    seen_urls.add(url)
+                    job["site"] = source
+                    unified_list.append(job)
+                    
+    # Cap to max results requested
+    if req.max_results:
+        unified_list = unified_list[:req.max_results]
+        
+    logger.info(f"Returning {len(unified_list)} flat unified aggregated jobs.")
+    return unified_list
 
-    # 4. Run the searcher asynchronously with optimized parameters
-    results = await jobspy_searcher.search(
-        keywords=req.keywords,
-        site_name=site_names,
-        location=location_term,
-        results_wanted=req.max_results,
-        hours_old=hours_old,
-        is_remote=is_remote,
-        countries=req.countries,
-        strict_country=req.strict_country,
-        job_type=req.job_type,
-        easy_apply=req.easy_apply,
-        linkedin_fetch_description=req.linkedin_fetch_description,
-        linkedin_company_ids=req.linkedin_company_ids,
-        google_search_term=req.google_search_term,
-        distance=req.distance,
-        proxies=req.proxies,
-        enforce_annual_salary=req.enforce_annual_salary,
-        user_agent=req.user_agent,
-        ca_cert=req.ca_cert,
-        description_format=req.description_format,
-    )
+
+@app.post("/search/jobspy", response_model=list[dict])
+async def search_jobspy(
+    req: SearchRequest,
+    orchestrator: JobOrchestrator = Depends(get_orchestrator),
+    cache: DeduplicationCache = Depends(get_cache),
+) -> list[dict]:
+    """
+    Drop-in compatibility route for legacy search/jobspy.
+    Routes to the new high-performance custom parallel spider engine dynamically.
+    """
+    logger.info("Routing legacy search/jobspy endpoint to parallel custom spiders engine.")
+    if req.reset_cache:
+        cache.clear()
+        
+    results = await orchestrator.orchestrate(req)
     
-    return results
+    # Flatten the result dictionary {linkedin: [...], indeed: [...]} into a single list
+    combined = []
+    for source in ["linkedin", "indeed"]:
+        if source in results:
+            for job in results[source]:
+                job["site"] = source
+                combined.append(job)
+                
+    return combined[:req.max_results]
 
 
 @app.get("/queries/preview")
@@ -372,6 +388,7 @@ async def preview_queries(
     job_type: str | None = Query(None),
     experience: str | None = Query(None),
     days_back: int = Query(1, ge=1, le=60),
+    dork_builder: DorkQueryBuilder = Depends(get_dork_builder),
 ) -> dict[str, Any]:
     kw_list = [item.strip() for item in keywords.split(",") if item.strip()]
     site_list = [item.strip() for item in sites.split(",") if item.strip()]
@@ -389,7 +406,11 @@ async def preview_queries(
 
 
 @app.post("/batch-search")
-async def batch_search(req: BatchSearchRequest) -> dict[str, Any]:
+async def batch_search(
+    req: BatchSearchRequest,
+    searcher: DuckDuckGoSearcher = Depends(get_searcher),
+    parser: JobResultParser = Depends(get_parser),
+) -> dict[str, Any]:
     query_dicts = [
         {"query": query, "keyword": "", "site": "custom", "strategy": "custom"}
         for query in req.queries
@@ -406,67 +427,12 @@ async def batch_search(req: BatchSearchRequest) -> dict[str, Any]:
 
 
 @app.delete("/cache")
-async def clear_cache() -> dict[str, Any]:
+async def clear_cache(cache: DeduplicationCache = Depends(get_cache)) -> dict[str, Any]:
     count = cache.size()
     cache.clear()
     return {"cleared": count, "message": f"Removed {count} seen URLs"}
 
 
 @app.get("/cache/stats")
-async def cache_stats() -> dict[str, Any]:
+async def cache_stats(cache: DeduplicationCache = Depends(get_cache)) -> dict[str, Any]:
     return {"seen_urls": cache.size(), "oldest_entry": cache.oldest()}
-
-
-def _ddg_timelimit(days_back: int, recent_hours: int | None) -> str:
-    if recent_hours is not None and recent_hours <= 24:
-        return "d"
-    if days_back <= 1:
-        return "d"
-    if days_back <= 7:
-        return "w"
-    return "m"
-
-
-def _filter_recent_jobs(
-    jobs: list[dict[str, Any]],
-    recent_hours: int | None,
-    posted_today: bool,
-    strict_recent: bool,
-) -> tuple[list[dict[str, Any]], int]:
-    now = datetime.utcnow()
-    cutoff = now - timedelta(hours=recent_hours) if recent_hours else None
-    filtered: list[dict[str, Any]] = []
-    skipped = 0
-
-    for job in jobs:
-        posted_at = _parse_posted_at(job.get("posted_at"))
-        if not posted_at:
-            if strict_recent:
-                skipped += 1
-                continue
-            filtered.append(job)
-            continue
-
-        if posted_today and posted_at.date() != now.date():
-            skipped += 1
-            continue
-
-        if cutoff and posted_at < cutoff:
-            skipped += 1
-            continue
-
-        filtered.append(job)
-
-    return filtered, skipped
-
-
-def _parse_posted_at(value: Any) -> datetime | None:
-    if not value:
-        return None
-    try:
-        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
-        if parsed.tzinfo:
-            parsed = parsed.astimezone(tz=None).replace(tzinfo=None)
-        return parsed
-    except Exception:
-        return None
