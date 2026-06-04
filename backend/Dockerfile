@@ -31,8 +31,6 @@ RUN apt-get update && apt-get install -y \
 
 RUN pip install --no-cache-dir playwright
 
-RUN playwright install chromium
-
 # =========================
 # Runtime Stage
 # =========================

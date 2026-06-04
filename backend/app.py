@@ -13,6 +13,9 @@ backend_dir = Path(__file__).resolve().parent
 if str(backend_dir) not in sys.path:
     sys.path.insert(0, str(backend_dir))
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from dependencies import get_job_repository
 from routes.cache import router as cache_router
 from routes.health import router as health_router

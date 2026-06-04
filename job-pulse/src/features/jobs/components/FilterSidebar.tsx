@@ -1,18 +1,16 @@
 import { useMemo } from "react";
-import type { JobResult } from "../types";
+import type { Job } from "../types";
 import { isEmpty } from "../utils";
 
 export interface ClientFilters {
   companies: string[];
   locations: string[];
   remoteOnly: boolean;
-  levels: string[];
-  functions: string[];
-  salary: [number, number] | null;
+  tags: string[];
 }
 
 interface Props {
-  results: JobResult[];
+  results: Job[];
   filters: ClientFilters;
   onChange: (patch: Partial<ClientFilters>) => void;
 }
@@ -26,27 +24,12 @@ function counts<T extends string>(items: T[]): Array<{ v: T; n: number }> {
 export function FilterSidebar({ results, filters, onChange }: Props) {
   const companies = useMemo(() => counts(results.map((r) => r.company).filter((x) => !isEmpty(x))).slice(0, 10), [results]);
   const locations = useMemo(() => counts(results.map((r) => r.location).filter((x) => !isEmpty(x))).slice(0, 10), [results]);
-  const levels = useMemo(() => counts(results.map((r) => r.job_level).filter((x) => !isEmpty(x))), [results]);
-  const functions = useMemo(() => counts(results.map((r) => r.job_function).filter((x) => !isEmpty(x))), [results]);
-
-  const salaryStats = useMemo(() => {
-    const vals: number[] = [];
-    results.forEach((r) => {
-      const toN = (x: string | number) => {
-        if (typeof x === "number") return isNaN(x) ? null : x;
-        const t = (x || "").toString().replace(/[,\s]/g, "");
-        const n = parseFloat(t);
-        return isNaN(n) ? null : n;
-      };
-      const mn = toN(r.min_amount); const mx = toN(r.max_amount);
-      if (mn != null) vals.push(mn);
-      if (mx != null) vals.push(mx);
-    });
-    if (!vals.length) return null;
-    return { min: Math.min(...vals), max: Math.max(...vals) };
+  const tags = useMemo(() => {
+    const allTags = results.flatMap((r) => r.tags || []);
+    return counts(allTags.filter((x) => !isEmpty(x))).slice(0, 10);
   }, [results]);
 
-  const toggle = <K extends "companies" | "locations" | "levels" | "functions">(key: K, v: string) => {
+  const toggle = <K extends "companies" | "locations" | "tags">(key: K, v: string) => {
     const cur = filters[key];
     const next = cur.includes(v) ? cur.filter((x) => x !== v) : [...cur, v];
     onChange({ [key]: next } as unknown as Partial<ClientFilters>);
@@ -57,31 +40,15 @@ export function FilterSidebar({ results, filters, onChange }: Props) {
       <div className="jd-panel">
         <h4>Remote</h4>
         <label className="jd-switch">
-          <input type="checkbox" checked={filters.remoteOnly} onChange={(e) => onChange({ remoteOnly: e.target.checked })} />
-          <span className="track" /><span>Remote only</span>
+          <input
+            type="checkbox"
+            checked={filters.remoteOnly}
+            onChange={(e) => onChange({ remoteOnly: e.target.checked })}
+          />
+          <span className="track" />
+          <span>Remote only</span>
         </label>
       </div>
-
-      {salaryStats && (
-        <div className="jd-panel">
-          <h4>Salary</h4>
-          <div className="mono" style={{ fontSize: 11, color: "var(--jd-muted)", marginBottom: 8 }}>
-            {filters.salary ? `${filters.salary[0].toLocaleString()} – ${filters.salary[1].toLocaleString()}` : `${salaryStats.min.toLocaleString()} – ${salaryStats.max.toLocaleString()}`}
-          </div>
-          <input
-            type="range" min={salaryStats.min} max={salaryStats.max}
-            value={filters.salary ? filters.salary[0] : salaryStats.min}
-            onChange={(e) => onChange({ salary: [parseInt(e.target.value, 10), filters.salary ? filters.salary[1] : salaryStats.max] })}
-            className="jd-slider"
-          />
-          <input
-            type="range" min={salaryStats.min} max={salaryStats.max}
-            value={filters.salary ? filters.salary[1] : salaryStats.max}
-            onChange={(e) => onChange({ salary: [filters.salary ? filters.salary[0] : salaryStats.min, parseInt(e.target.value, 10)] })}
-            className="jd-slider" style={{ marginTop: 8 }}
-          />
-        </div>
-      )}
 
       {companies.length > 0 && (
         <div className="jd-panel">
@@ -113,28 +80,15 @@ export function FilterSidebar({ results, filters, onChange }: Props) {
         </div>
       )}
 
-      {levels.length > 0 && (
+      {tags.length > 0 && (
         <div className="jd-panel">
-          <h4>Experience</h4>
+          <h4>Tags / Tech</h4>
           <div className="jd-checklist">
-            {levels.map((c) => (
-              <label key={c.v}>
-                <input type="checkbox" checked={filters.levels.includes(c.v)} onChange={() => toggle("levels", c.v)} />
-                <span>{c.v}</span><span className="count">{c.n}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {functions.length > 0 && (
-        <div className="jd-panel">
-          <h4>Job Function</h4>
-          <div className="jd-checklist">
-            {functions.map((c) => (
-              <label key={c.v}>
-                <input type="checkbox" checked={filters.functions.includes(c.v)} onChange={() => toggle("functions", c.v)} />
-                <span>{c.v}</span><span className="count">{c.n}</span>
+            {tags.map((t) => (
+              <label key={t.v}>
+                <input type="checkbox" checked={filters.tags.includes(t.v)} onChange={() => toggle("tags", t.v)} />
+                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.v}</span>
+                <span className="count">{t.n}</span>
               </label>
             ))}
           </div>

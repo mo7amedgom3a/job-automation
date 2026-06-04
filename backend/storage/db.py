@@ -5,9 +5,11 @@ from __future__ import annotations
 from repository.jobs import JobRepository
 
 try:
-    from config.settings import DEDUP_WINDOW_HOURS
+    from config.settings import DEDUP_WINDOW_HOURS, DEFAULT_SEARCH_LIMIT, DEFAULT_SEARCH_OFFSET
 except ModuleNotFoundError:
     DEDUP_WINDOW_HOURS = 24
+    DEFAULT_SEARCH_LIMIT = 50
+    DEFAULT_SEARCH_OFFSET = 0
 
 _repository = JobRepository()
 
@@ -52,3 +54,22 @@ def get_jobs_by_fingerprints(
     db_path: str | None = None,
 ) -> list[dict]:
     return _repository.get_jobs_by_fingerprints(fingerprints)
+
+
+def search_jobs(
+    keywords: list[str] | None = None,
+    countries: list[str] | None = None,
+    company: str | None = None,
+    remote: bool | None = None,
+    limit: int = DEFAULT_SEARCH_LIMIT,
+    offset: int = DEFAULT_SEARCH_OFFSET,
+    db_path: str | None = None,
+) -> tuple[list[dict], int]:
+    return _repository.search_jobs(
+        keywords=keywords,
+        countries=countries,
+        company=company,
+        remote=remote,
+        limit=limit,
+        offset=offset,
+    )

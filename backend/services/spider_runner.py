@@ -9,6 +9,7 @@ from datetime import datetime
 from typing import Any
 
 from repository.jobs import JobRepository
+from config.settings import DEFAULT_RECENT_HOURS
 
 logger = logging.getLogger("job_aggregator.services.spider_runner")
 
@@ -16,7 +17,7 @@ logger = logging.getLogger("job_aggregator.services.spider_runner")
 class SpiderRunner:
     """Runs a named spider in an executor thread."""
 
-    def __init__(self, repository: JobRepository, recent_hours: int = 72) -> None:
+    def __init__(self, repository: JobRepository, recent_hours: int = DEFAULT_RECENT_HOURS) -> None:
         self.repository = repository
         self.recent_hours = recent_hours
 
@@ -42,7 +43,7 @@ class SpiderRunner:
 
             cfg.enabled = True
             if "indeed" in spider_name or "linkedin" in spider_name:
-                cfg.max_pages = int(env_overrides.get("MAX_PAGES", "5"))
+                cfg.max_pages = int(env_overrides.get("MAX_PAGES", "0"))
 
             logger.info("Executing spider '%s'", spider_name)
             run_spider(cfg)

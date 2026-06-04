@@ -10,3 +10,4 @@ scrapling[spiders]
 scrapling[fetchers]
 uvloop; sys_platform != "win32"
 playwright
+chromium

@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from cache.cache import DeduplicationCache
 from dork_builder import DorkQueryBuilder
 from google_api_search_engine import GoogleApiSearcher

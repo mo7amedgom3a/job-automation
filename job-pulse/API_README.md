@@ -39,7 +39,7 @@ sequenceDiagram
 
     Note over User, DB: 3. Query Jobs (POST /search)
     User->>API: POST /search (JobSearchRequest)
-    API->>DB: Query jobs with filters (keywords, countries, company, remote)
+    API->>DB: Query jobs with filters (keywords, country, company, remote)
     DB-->>API: Returns filtered job records & count
     API-->>User: Returns paginated country groups (Fast response)
 ```
@@ -66,45 +66,22 @@ None.
 
 ---
 
-### 1.1 Trigger Sub-Aggregate Scraping (Background Task)
-* **Endpoint:** `POST /search/aggregate/sub`
-* **Summary:** Trigger Background Sub-Aggregation Process.
-* **Description:** Initiates asynchronous background tasks to crawl and scrape jobs from specific country and job board combinations based on existing spider names (e.g. `linkedin_eg` for country `"egypt"` and job board `"linkedin"`). The results are saved to the PostgreSQL database.
-
-#### Request Body (`SubAggregateRequest`)
-```json
-{
-  "country": "egypt",
-  "job_board": "linkedin"
-}
-```
-
-#### Response (`dict[str, str]`)
-```json
-{
-  "status": "initiated",
-  "message": "Sub-aggregation process started in the background for linkedin in egypt."
-}
-```
-
----
-
 ### 2. Search Aggregated Jobs
 * **Endpoint:** `POST /search`
 * **Summary:** Search Aggregated Jobs.
 * **Description:** Retrieves and filters aggregated job listings directly from the database. The results are grouped by country and job board, and sorted within each board by date (newest first).
 * **Behavior for Optional Fields**:
   - `limit` (default 50) and `offset` (default 0) are the only non-optional fields.
-  - `keywords`, `countries`, `company`, and `remote` are fully optional.
+  - `keywords`, `country`, `company`, and `remote` are fully optional.
   - `keywords` (when provided as a list of strings) matches job listings containing **any** of the specified terms (using `OR` logic).
-  - If `countries` is omitted or `null`, jobs from **all countries** are returned and grouped dynamically.
+  - If `country` is omitted or `null`, jobs from **all countries** are returned and grouped dynamically.
   - If `remote` is omitted or `null`, **all job types** (remote, onsite, and hybrid) are returned without filtering.
 
 #### Request Body (`JobSearchRequest`)
 ```json
 {
   "keywords": ["engineer", "python"],
-  "countries": null,
+  "country": null,
   "company": "Google",
   "remote": null,
   "limit": 50,

@@ -1,0 +1,63 @@
+[2026-06-03 21:49:38] INFO     job_aggregator.repository.jobs: PostgreSQL schema is ready.
+[2026-06-03 21:49:38] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=remotive
+[2026-06-03 21:49:38] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-03 18:49 UTC | 1 site(s) ═══
+[2026-06-03 21:56:58] INFO     job_aggregator.repository.jobs: PostgreSQL schema is ready.
+[2026-06-03 21:56:58] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=remotive
+[2026-06-03 21:56:58] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-03 18:56 UTC | 1 site(s) ═══
+[2026-06-03 21:56:58] INFO     job_scraper.scheduler: ▶  Starting spider: remotive
+[2026-06-03 21:57:25] INFO     job_scraper.scheduler: ✔  Spider remotive finished in 26.8s | requests=1 | items=23 | blocked=0
+[2026-06-03 21:57:25] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 23 ═══
+[2026-06-03 21:57:25] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-04 04:27:19] INFO     job_aggregator.repository.jobs: PostgreSQL schema is ready.
+[2026-06-04 04:27:19] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=indeed_sa
+[2026-06-04 04:27:19] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-04 01:27 UTC | 1 site(s) ═══
+[2026-06-04 04:27:19] INFO     job_scraper.scheduler: ▶  Starting spider: indeed_sa
+[2026-06-04 04:29:28] INFO     job_aggregator.repository.jobs: PostgreSQL schema is ready.
+[2026-06-04 04:29:28] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=indeed_sa
+[2026-06-04 04:29:28] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-04 01:29 UTC | 1 site(s) ═══
+[2026-06-04 04:29:28] INFO     job_scraper.scheduler: ▶  Starting spider: indeed_sa
+[2026-06-04 04:29:59] INFO     job_scraper.scheduler: ✔  Spider indeed_sa finished in 30.6s | requests=2 | items=0 | blocked=0
+[2026-06-04 04:29:59] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-04 04:29:59] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-04 04:30:08] INFO     job_aggregator.repository.jobs: PostgreSQL schema is ready.
+[2026-06-04 04:30:08] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=indeed_eg
+[2026-06-04 04:30:08] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-04 01:30 UTC | 1 site(s) ═══
+[2026-06-04 04:30:08] INFO     job_scraper.scheduler: ▶  Starting spider: indeed_eg
+[2026-06-04 04:30:40] INFO     job_scraper.scheduler: ✔  Spider indeed_eg finished in 31.5s | requests=2 | items=0 | blocked=0
+[2026-06-04 04:30:40] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-04 04:30:40] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-04 04:31:27] INFO     job_aggregator.repository.jobs: PostgreSQL schema is ready.
+[2026-06-04 04:31:27] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=indeed_sa
+[2026-06-04 04:31:27] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-04 01:31 UTC | 1 site(s) ═══
+[2026-06-04 04:31:27] INFO     job_scraper.scheduler: ▶  Starting spider: indeed_sa
+[2026-06-04 04:32:06] INFO     job_scraper.scheduler: ✔  Spider indeed_sa finished in 39.9s | requests=2 | items=2 | blocked=0
+[2026-06-04 04:32:06] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 2 ═══
+[2026-06-04 04:32:06] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-04 04:34:24] INFO     job_aggregator.repository.jobs: PostgreSQL schema is ready.
+[2026-06-04 04:34:24] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=indeed_eg
+[2026-06-04 04:34:24] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-04 01:34 UTC | 1 site(s) ═══
+[2026-06-04 04:34:24] INFO     job_scraper.scheduler: ▶  Starting spider: indeed_eg
+[2026-06-04 04:34:55] INFO     job_scraper.scheduler: ✔  Spider indeed_eg finished in 30.4s | requests=2 | items=0 | blocked=0
+[2026-06-04 04:34:55] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 0 ═══
+[2026-06-04 04:34:55] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-04 04:35:11] INFO     job_aggregator.repository.jobs: PostgreSQL schema is ready.
+[2026-06-04 04:35:11] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=indeed
+[2026-06-04 04:35:11] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-04 01:35 UTC | 1 site(s) ═══
+[2026-06-04 04:35:11] INFO     job_scraper.scheduler: ▶  Starting spider: indeed
+[2026-06-04 04:37:16] INFO     job_scraper.scheduler: ✔  Spider indeed finished in 125.3s | requests=1 | items=15 | blocked=0
+[2026-06-04 04:37:16] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 15 ═══
+[2026-06-04 04:37:16] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-04 04:41:41] INFO     job_aggregator.repository.jobs: PostgreSQL schema is ready.
+[2026-06-04 04:41:41] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=indeed_sa
+[2026-06-04 04:41:41] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-04 01:41 UTC | 1 site(s) ═══
+[2026-06-04 04:41:41] INFO     job_scraper.scheduler: ▶  Starting spider: indeed_sa
+[2026-06-04 04:42:29] INFO     job_scraper.scheduler: ✔  Spider indeed_sa finished in 48.0s | requests=8 | items=164 | blocked=0
+[2026-06-04 04:42:29] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 164 ═══
+[2026-06-04 04:42:29] INFO     job_scraper.scheduler: --once flag set. Exiting.
+[2026-06-04 05:16:10] INFO     job_aggregator.repository.jobs: PostgreSQL schema is ready.
+[2026-06-04 05:16:10] INFO     job_scraper.scheduler: Job Board Scraping Engine starting | interval=1h | once=True | site=indeed_ae
+[2026-06-04 05:16:10] INFO     job_scraper.scheduler: ═══ Scrape cycle started at 2026-06-04 02:16 UTC | 1 site(s) ═══
+[2026-06-04 05:16:10] INFO     job_scraper.scheduler: ▶  Starting spider: indeed_ae
+[2026-06-04 05:19:46] INFO     job_scraper.scheduler: ✔  Spider indeed_ae finished in 216.2s | requests=32 | items=771 | blocked=0
+[2026-06-04 05:19:46] INFO     job_scraper.scheduler: ═══ Cycle complete | total new jobs: 771 ═══
+[2026-06-04 05:19:46] INFO     job_scraper.scheduler: --once flag set. Exiting.

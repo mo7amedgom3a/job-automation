@@ -6,19 +6,11 @@ from dataclasses import dataclass
 from typing import Optional
 
 from pydantic import BaseModel, Field
-
+from config.settings import KEYWORDS, DEFAULT_SEARCH_LIMIT, MAX_SEARCH_LIMIT, DEFAULT_SEARCH_OFFSET
 
 class SearchRequest(BaseModel):
     keywords: list[str] = Field(
-        default_factory=lambda: [
-            "devops",
-            "kubernetes",
-            "terraform",
-            "aws",
-            "python",
-            "golang",
-            "fastapi",
-        ],
+        default_factory=lambda: KEYWORDS,
         description="List of target search keywords (e.g. backend, devops, react). Used to search job descriptions and titles.",
         examples=[["backend", "python", "fastapi"]]
     )
@@ -73,11 +65,11 @@ class SearchRequest(BaseModel):
         examples=["senior", "junior"]
     )
     max_results: int = Field(
-        default=50,
+        default=DEFAULT_SEARCH_LIMIT,
         ge=1,
-        le=200,
+        le=MAX_SEARCH_LIMIT,
         description="Maximum number of unified search results to return.",
-        examples=[50]
+        examples=[DEFAULT_SEARCH_LIMIT]
     )
     days_back: int = Field(
         default=1,
@@ -268,6 +260,51 @@ class SearchResponse(BaseModel):
         description="ISO 8601 UTC timestamp of the search completion.",
         examples=["2026-06-02T17:59:20Z"]
     )
+
+
+class JobSearchRequest(BaseModel):
+    keywords: Optional[list[str]] = Field(None, description="List of keywords to match in title, description, or tags.", examples=[["python", "devops"]])
+    countries: Optional[list[str]] = Field(None, description="Filter jobs by one or more country names (matched against location/tags/source).", examples=[["egypt", "germany"]])
+    company: Optional[str] = Field(None, description="Filter jobs by hiring company name.", examples=["Google"])
+    remote: Optional[bool] = Field(None, description="Filter remote jobs. If true, only remote jobs. If false, only non-remote.", examples=[True])
+    limit: int = Field(DEFAULT_SEARCH_LIMIT, ge=1, le=MAX_SEARCH_LIMIT, description="Maximum number of results to return.", examples=[DEFAULT_SEARCH_LIMIT])
+    offset: int = Field(DEFAULT_SEARCH_OFFSET, ge=0, description="Offset for pagination.", examples=[DEFAULT_SEARCH_OFFSET])
+
+
+class SubAggregateRequest(BaseModel):
+    country: str = Field(..., description="Country name (e.g. egypt, saudi, germany).", examples=["egypt"])
+    job_board: str = Field(..., description="Job board name (e.g. linkedin, indeed).", examples=["linkedin"])
+
+
+class JobItem(BaseModel):
+    id: str = Field(description="Unique MD5 hash fingerprint generated from the job URL.")
+    title: str = Field(description="Title of the job posting.")
+    company: str = Field(description="Name of the company hiring.")
+    url: str = Field(description="Direct URL to the job posting.")
+    description: str = Field(description="Brief snippet or full description of the role.")
+    location: str = Field(description="Physical location or remote eligibility status of the role.")
+    salary: str = Field(description="Extracted salary range or pay structure, if available.")
+    source: str = Field(description="Original platform or job board the listing was parsed from.")
+    site: str = Field(description="Alias / site domain.")
+    tags: list[str] = Field(description="Associated tag list.")
+    scraped_at: str = Field(description="ISO timestamp when the job was scraped.")
+
+
+class JobBoardGroup(BaseModel):
+    name: str = Field(description="Name of the job board (e.g. linkedin, indeed, weworkremotely).")
+    jobs: list[JobItem] = Field(description="List of jobs in this board, sorted by scraped date.")
+
+
+class CountryGroup(BaseModel):
+    country: str = Field(description="Country name (e.g. Egypt, Saudi Arabia, Germany, Remote).")
+    job_boards: list[JobBoardGroup] = Field(description="Job boards available for this country.")
+
+
+class PaginatedSearchResponse(BaseModel):
+    total: int = Field(description="Total number of matching job listings.")
+    limit: int = Field(description="The maximum number of items requested.")
+    offset: int = Field(description="The offset/starting position of the items.")
+    results: list[CountryGroup] = Field(description="The paginated and grouped list of jobs.")
 
 
 @dataclass(slots=True)

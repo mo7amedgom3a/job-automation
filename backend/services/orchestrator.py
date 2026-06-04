@@ -10,6 +10,7 @@ from models.job import SearchRequest
 from services.filters import is_blacklisted_company
 from services.google_search import GoogleJobSearchService
 from services.spider_runner import SpiderRunner
+from config.settings import SITES, KEYWORDS, DEFAULT_MAX_CONCURRENT_SPIDERS, DEFAULT_INDEED_LIMIT, DEFAULT_MAX_PAGES
 
 logger = logging.getLogger("job_aggregator.services.orchestrator")
 
@@ -21,7 +22,7 @@ class JobOrchestrator:
         self,
         spider_runner: SpiderRunner | None = None,
         google_search_service: GoogleJobSearchService | None = None,
-        max_concurrent_spiders: int = 2,
+        max_concurrent_spiders: int = DEFAULT_MAX_CONCURRENT_SPIDERS,
     ) -> None:
         if spider_runner is None:
             from dependencies import get_spider_runner
@@ -35,36 +36,40 @@ class JobOrchestrator:
         self.max_concurrent_spiders = max_concurrent_spiders
 
     async def orchestrate(self, req: SearchRequest) -> dict[str, list[dict[str, Any]]]:
-        keywords = req.keywords or [
-            "software engineer",
-            "full stack",
-            "backend",
-            "DevOps",
-            "cloud",
-            "SRE",
-            "AWS",
-            "DevSecOps",
-            "forward deployed engineer",
-            "AI",
-            "Engineer",
-            "Developer",
-            "Programmer",
-            "web developer",
-        ]
+        keywords = req.keywords or KEYWORDS
+        
 
         is_remote = self._is_remote(req)
         location = self._location(req, is_remote)
         primary_country = req.countries[0].title() if req.countries else "Egypt"
 
-        env_overrides = self._build_env_overrides(req, keywords)
-        spiders_to_run = self._select_spiders(is_remote, primary_country, location, env_overrides)
+        base_env_overrides = self._build_env_overrides(req, keywords)
+        spiders_to_run = self._select_spiders(is_remote, primary_country, location, base_env_overrides)
         logger.info("Determined spiders to execute: %s", spiders_to_run)
 
         semaphore = asyncio.Semaphore(self.max_concurrent_spiders)
 
         async def run_spider(name: str) -> list[dict[str, Any]]:
+            # Find spider config to check for site-specific keywords in settings
+            cfg = next((s for s in SITES if s.name == name), None)
+            
+            # Use request keywords if user specified them; otherwise fall back to settings keywords if defined
+            # If not defined in settings, use the fallback keywords.
+            if req.keywords:
+                spider_keywords = req.keywords
+            elif cfg and cfg.keywords:
+                spider_keywords = cfg.keywords
+            else:
+                spider_keywords = keywords
+                
+            spider_env = self._build_env_overrides(req, spider_keywords)
+            # Propagate any other settings configured during selection
+            for k, v in base_env_overrides.items():
+                if k not in spider_env:
+                    spider_env[k] = v
+                    
             async with semaphore:
-                return await self.spider_runner.run(name, env_overrides)
+                return await self.spider_runner.run(name, spider_env)
 
         spider_tasks = [run_spider(name) for name in spiders_to_run]
         google_task = self.google_search_service.search_jobs(
@@ -93,6 +98,8 @@ class JobOrchestrator:
                 results["linkedin"].extend(result)
             elif "indeed" in spider_name:
                 results["indeed"].extend(result)
+            else:
+                results.setdefault(spider_name, []).extend(result)
 
         for source in results:
             results[source] = [
@@ -122,8 +129,8 @@ class JobOrchestrator:
             "LINKEDIN_TPR": "r86400" if hours_old == 24 else "r259200",
             "INDEED_QUERY": search_term,
             "INDEED_FROMAGE": "1" if hours_old == 24 else "3",
-            "INDEED_LIMIT": "50",
-            "MAX_PAGES": "5",
+            "INDEED_LIMIT": str(DEFAULT_INDEED_LIMIT),
+            "MAX_PAGES": str(DEFAULT_MAX_PAGES),
         }
 
     def _select_spiders(
@@ -133,38 +140,39 @@ class JobOrchestrator:
         location: str,
         env_overrides: dict[str, str],
     ) -> list[str]:
+        # Filter sites that are enabled in settings config
+        enabled_names = {site.name for site in SITES if site.enabled}
+
         if is_remote:
+            # For remote searches, run all enabled general/regional version spiders,
+            # but exclude the base 'linkedin' and 'indeed' configuration objects
+            # as we run country-specific versions instead
             return [
-                "linkedin_sa",
-                "linkedin_eg",
-                "linkedin_ae",
-                "linkedin_barcelona",
-                "linkedin_germany",
-                "linkedin_poland",
-                "linkedin_spain",
-                "linkedin_canada",
-                "indeed_eg",
-                "indeed_sa",
-                "indeed_ae",
+                name for name in enabled_names
+                if name not in {"linkedin", "indeed"}
             ]
 
         country = primary_country.lower().strip()
         location_lower = location.lower()
-        if "egypt" in country or "cairo" in location_lower:
-            return ["linkedin_eg", "indeed_eg"]
-        if "saudi" in country:
-            return ["linkedin_sa", "indeed_sa"]
-        if "emirates" in country or "ae" in country or "uae" in country:
-            return ["linkedin_ae", "indeed_ae"]
-        if "germany" in country:
-            return ["linkedin_germany"]
-        if "poland" in country:
-            return ["linkedin_poland"]
-        if "spain" in country or "barcelona" in location_lower:
-            return ["linkedin_spain", "linkedin_barcelona"]
-        if "canada" in country:
-            return ["linkedin_canada"]
+        selected = []
 
-        env_overrides["LINKEDIN_LOCATION"] = location
-        env_overrides["INDEED_LOCATION"] = location
-        return ["linkedin", "indeed"]
+        if "egypt" in country or "cairo" in location_lower:
+            selected = ["linkedin_eg", "indeed_eg"]
+        elif "saudi" in country:
+            selected = ["linkedin_sa", "indeed_sa"]
+        elif "emirates" in country or "ae" in country or "uae" in country:
+            selected = ["linkedin_ae", "indeed_ae"]
+        elif "germany" in country:
+            selected = ["linkedin_germany"]
+        elif "poland" in country:
+            selected = ["linkedin_poland"]
+        elif "spain" in country or "barcelona" in location_lower:
+            selected = ["linkedin_spain", "linkedin_barcelona"]
+        elif "canada" in country:
+            selected = ["linkedin_canada"]
+        else:
+            env_overrides["LINKEDIN_LOCATION"] = location
+            env_overrides["INDEED_LOCATION"] = location
+            selected = ["linkedin", "indeed"]
+
+        return [name for name in selected if name in enabled_names]

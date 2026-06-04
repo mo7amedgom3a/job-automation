@@ -159,6 +159,14 @@ class BaseJobSpider(Spider):
 
     async def on_scraped_item(self, item: dict) -> dict | None:
         """Persist to DB and deduplicate before adding to result list."""
+        # Restrict remote job boards to jobs posted within the last 3 days
+        if self.name in {"remoteok", "weworkremotely", "jobicy", "remotive", "himalayas", "trueup"}:
+            date_posted = item.get("date_posted")
+            from services.filters import is_within_3_days
+            if not is_within_3_days(date_posted):
+                self.logger.info("[%s] Dropping item older than 3 days: %s (posted: %s)", self.name, item.get("title"), date_posted)
+                return None
+
         was_new, fp = save_job(item, source=self.site_config.name)
         if was_new:
             self._items_new += 1
@@ -244,6 +252,14 @@ class BaseJobSpider(Spider):
             current,
             next_sid,
         )
+        
+        # Adjust timeout if it exists in _session_kwargs and we are using a Playwright fetcher
+        if next_sid in {"dynamic", "stealth"} and hasattr(request, "_session_kwargs") and "timeout" in request._session_kwargs:
+            t = request._session_kwargs["timeout"]
+            if t is not None and t < 1000:
+                request._session_kwargs["timeout"] = t * 1000
+                self.logger.info("Escalation: converted timeout from %d seconds to %d ms for Playwright", t, t * 1000)
+                
         return request
 
     # ── start_requests: attach default session id ─────────────────────────────
@@ -251,7 +267,15 @@ class BaseJobSpider(Spider):
     async def start_requests(self) -> AsyncGenerator:
         sid = self._default_sid()
         cfg = self.site_config
-        kwargs = cfg.extra_fetch_kwargs or {}
+        kwargs = dict(cfg.extra_fetch_kwargs or {})
+        
+        # If starting with dynamic/stealth, and timeout is in seconds, convert to ms
+        if sid in {"dynamic", "stealth"} and "timeout" in kwargs:
+            t = kwargs["timeout"]
+            if t is not None and t < 1000:
+                kwargs["timeout"] = t * 1000
+                self.logger.info("Converted start request timeout from %d seconds to %d ms for Playwright", t, t * 1000)
+
         for url in self.site_config.start_urls:
             yield Request(url, callback=self.parse, sid=sid, **kwargs)
 
@@ -278,11 +302,16 @@ class BaseJobSpider(Spider):
         if cfg.max_pages == 0 or self._page_counts[domain] < cfg.max_pages:
             next_href = response.css(cfg.next_page_selector).get()
             if next_href:
-                kwargs = cfg.extra_fetch_kwargs or {}
+                kwargs = dict(cfg.extra_fetch_kwargs or {})
+                next_sid = getattr(response, "meta", {}).get("sid", self._default_sid())
+                if next_sid in {"dynamic", "stealth"} and "timeout" in kwargs:
+                    t = kwargs["timeout"]
+                    if t is not None and t < 1000:
+                        kwargs["timeout"] = t * 1000
                 yield response.follow(
                     next_href,
                     callback=self.parse,
-                    sid=getattr(response, "meta", {}).get("sid", self._default_sid()),
+                    sid=next_sid,
                     **kwargs
                 )
 

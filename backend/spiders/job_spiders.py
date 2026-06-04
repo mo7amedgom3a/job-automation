@@ -19,7 +19,7 @@ from __future__ import annotations
 from typing import AsyncGenerator
 from scrapling.spiders import Response, Request
 
-from config.settings import SITES
+from config.settings import SITES, KEYWORDS
 from spiders.base import BaseJobSpider
 
 
@@ -51,6 +51,17 @@ class RemoteOKSpider(BaseJobSpider):
             if title and url:
                 if url.startswith("/"):
                     url = f"https://remoteok.com{url}"
+
+                # Extract date_posted
+                import re
+                date_posted = row.attrib.get("data-epoch") or row.css("time::attr(datetime)").get("").strip()
+                if not date_posted:
+                    for text_node in row.css("::text").getall():
+                        cleaned = text_node.strip()
+                        if re.match(r'^\d+[dhw]$', cleaned) or any(k in cleaned.lower() for k in ["ago", "yesterday", "today", "just now"]):
+                            date_posted = cleaned
+                            break
+
                 yield {
                     "title":    title,
                     "company":  company,
@@ -58,6 +69,7 @@ class RemoteOKSpider(BaseJobSpider):
                     "url":      url,
                     "tags":     tags,
                     "salary":   salary,
+                    "date_posted": date_posted,
                 }
 
 
@@ -81,11 +93,23 @@ class WeWorkRemotelySpider(BaseJobSpider):
 
             if title and href:
                 url = f"https://weworkremotely.com{href}" if href.startswith("/") else href
+
+                # Extract date_posted
+                import re
+                date_posted = card.css(".listing-date::text, .date::text").get("").strip()
+                if not date_posted:
+                    for text_node in card.css("::text").getall():
+                        cleaned = text_node.strip()
+                        if re.match(r'^\d+[dhw]$', cleaned) or any(k in cleaned.lower() for k in ["ago", "yesterday", "today", "just now"]):
+                            date_posted = cleaned
+                            break
+
                 yield {
                     "title":    title,
                     "company":  company,
                     "location": location,
                     "url":      url,
+                    "date_posted": date_posted,
                 }
 
 
@@ -108,6 +132,7 @@ class JobicySpider(BaseJobSpider):
                     location = job.get("jobGeo", "Remote").strip()
                     url = job.get("url", "").strip()
                     tags = job.get("jobIndustry", []) + job.get("jobType", [])
+                    date_posted = job.get("pubDate")
 
                     if title and url:
                         yield {
@@ -117,6 +142,7 @@ class JobicySpider(BaseJobSpider):
                             "url":      url,
                             "tags":     tags,
                             "salary":   "",
+                            "date_posted": date_posted,
                         }
                 return
         except Exception:
@@ -134,6 +160,17 @@ class JobicySpider(BaseJobSpider):
             if title and url:
                 if url.startswith("/"):
                     url = f"https://jobicy.com{url}"
+
+                # Extract date_posted
+                import re
+                date_posted = card.css(".job-date::text, .date::text, time::text, time::attr(datetime)").get("").strip()
+                if not date_posted:
+                    for text_node in card.css("::text").getall():
+                        cleaned = text_node.strip()
+                        if re.match(r'^\d+[dhw]$', cleaned) or any(k in cleaned.lower() for k in ["ago", "yesterday", "today", "just now"]):
+                            date_posted = cleaned
+                            break
+
                 yield {
                     "title":    title,
                     "company":  company,
@@ -141,6 +178,7 @@ class JobicySpider(BaseJobSpider):
                     "url":      url,
                     "tags":     tags,
                     "salary":   salary,
+                    "date_posted": date_posted,
                 }
 
 
@@ -164,6 +202,7 @@ class RemotiveSpider(BaseJobSpider):
                     url = job.get("url", "").strip()
                     tags = job.get("tags", [])
                     salary = job.get("salary", "").strip()
+                    date_posted = job.get("publication_date")
 
                     if title and url:
                         yield {
@@ -173,6 +212,7 @@ class RemotiveSpider(BaseJobSpider):
                             "url":      url,
                             "tags":     tags,
                             "salary":   salary,
+                            "date_posted": date_posted,
                         }
                 return
         except Exception:
@@ -190,6 +230,17 @@ class RemotiveSpider(BaseJobSpider):
             if title and url:
                 if url.startswith("/"):
                     url = f"https://remotive.com{url}"
+
+                # Extract date_posted
+                import re
+                date_posted = card.css(".job-date::text, .date::text, time::text, time::attr(datetime)").get("").strip()
+                if not date_posted:
+                    for text_node in card.css("::text").getall():
+                        cleaned = text_node.strip()
+                        if re.match(r'^\d+[dhw]$', cleaned) or any(k in cleaned.lower() for k in ["ago", "yesterday", "today", "just now"]):
+                            date_posted = cleaned
+                            break
+
                 yield {
                     "title":    title,
                     "company":  company,
@@ -197,6 +248,7 @@ class RemotiveSpider(BaseJobSpider):
                     "url":      url,
                     "tags":     tags,
                     "salary":   salary,
+                    "date_posted": date_posted,
                 }
 
 
@@ -239,6 +291,8 @@ class HimalayasSpider(BaseJobSpider):
                     elif max_sal:
                         salary = f"Up to {max_sal} {currency}"
 
+                    date_posted = job.get("pubDate")
+
                     if title and url:
                         yield {
                             "title":    title,
@@ -247,6 +301,7 @@ class HimalayasSpider(BaseJobSpider):
                             "url":      url,
                             "tags":     tags,
                             "salary":   salary,
+                            "date_posted": date_posted,
                         }
                 return
         except Exception:
@@ -264,6 +319,17 @@ class HimalayasSpider(BaseJobSpider):
             if title and url:
                 if url.startswith("/"):
                     url = f"https://himalayas.app{url}"
+
+                # Extract date_posted
+                import re
+                date_posted = card.css("time::attr(datetime), time::text, .date::text, [class*='date']::text").get("").strip()
+                if not date_posted:
+                    for text_node in card.css("::text").getall():
+                        cleaned = text_node.strip()
+                        if re.match(r'^\d+[dhw]$', cleaned) or any(k in cleaned.lower() for k in ["ago", "yesterday", "today", "just now"]):
+                            date_posted = cleaned
+                            break
+
                 yield {
                     "title":    title,
                     "company":  company,
@@ -271,6 +337,7 @@ class HimalayasSpider(BaseJobSpider):
                     "url":      url,
                     "tags":     tags,
                     "salary":   salary,
+                    "date_posted": date_posted,
                 }
 
 
@@ -331,7 +398,18 @@ class TrueUpSpider(BaseJobSpider):
 
             tags = card.css("span.font-mono::text").getall()
             tags = [t.strip() for t in tags if t.strip()]
-            print(f"Extracted job: title='{title}', company='{company}', location='{location}', url='{url}', tags={tags}, salary='{salary}'")
+
+            # Extract date_posted
+            import re
+            date_posted = card.css("time::attr(datetime), time::text").get("").strip()
+            if not date_posted:
+                for text_node in card.css("::text").getall():
+                    cleaned = text_node.strip()
+                    if re.match(r'^\d+[dhw]$', cleaned) or any(k in cleaned.lower() for k in ["ago", "yesterday", "today", "just now"]):
+                        date_posted = cleaned
+                        break
+
+            print(f"Extracted job: title='{title}', company='{company}', location='{location}', url='{url}', tags={tags}, salary='{salary}', date_posted='{date_posted}'")
             yield {
                 "title":    title,
                 "company":  company,
@@ -339,6 +417,7 @@ class TrueUpSpider(BaseJobSpider):
                 "url":      url,
                 "tags":     tags,
                 "salary":   salary,
+                "date_posted": date_posted,
             }
 
 
@@ -359,8 +438,11 @@ class LinkedInSpider(BaseJobSpider):
         parsed = urlparse(start_url)
         params = parse_qs(parsed.query)
 
-        # Get first element of query parameters list, or default
-        keywords = os.getenv("LINKEDIN_KEYWORDS", params.get("keywords", ["Software Engineer"])[0])
+        # Use keywords from site_config, or fallback to env var
+        if self.site_config.keywords:
+            keywords = os.getenv("LINKEDIN_KEYWORDS", " ".join(self.site_config.keywords))
+        else:
+            keywords = os.getenv("LINKEDIN_KEYWORDS", params.get("keywords", KEYWORDS)[0])
         location = os.getenv("LINKEDIN_LOCATION", params.get("location", ["Cairo"])[0])
         geo_id = os.getenv("LINKEDIN_GEO_ID", params.get("geoId", ["101131993"])[0])
         distance = os.getenv("LINKEDIN_DISTANCE", params.get("distance", ["25"])[0])
@@ -460,8 +542,14 @@ class IndeedSpider(BaseJobSpider):
         parsed = urlparse(start_url)
         params = parse_qs(parsed.query)
 
-        # Get first element of query parameters list, or default
-        query = os.getenv("INDEED_QUERY", params.get("q", ['"software engineer" OR DevOps OR backend OR AWS OR terraform OR python OR Golang'])[0])
+        # Build query from site_config keywords or fallback to env var
+        if self.site_config.keywords:
+            # Format keywords as "keyword1" OR "keyword2" OR keyword3
+            formatted_keywords = [f'\"{kw}\"' if ' ' in kw else kw for kw in self.site_config.keywords]
+            default_query = " OR ".join(formatted_keywords)
+            query = os.getenv("INDEED_QUERY", default_query)
+        else:
+            query = os.getenv("INDEED_QUERY", params.get("q", ["\"software engineer\" OR DevOps OR backend OR AWS OR terraform OR python OR Golang"])[0])
         location = os.getenv("INDEED_LOCATION", params.get("l", [""])[0])
         fromage = os.getenv("INDEED_FROMAGE", params.get("fromage", ["3"])[0])
         limit = os.getenv("INDEED_LIMIT", params.get("limit", [""])[0])
@@ -486,6 +574,7 @@ class IndeedSpider(BaseJobSpider):
             parsed.netloc,
             parsed.path,
             parsed.params,
+        
             new_query,
             parsed.fragment
         ))
@@ -511,6 +600,12 @@ class IndeedSpider(BaseJobSpider):
                 title = card.css("span[id^='jobTitle']::text").get("").strip()
             if not title:
                 title = card.css("a.jcs-JobTitle span::text").get("").strip()
+            if not title:
+                title = card.css("h3.jobTitle a::text").get("").strip()
+            if not title:
+                title = card.css("h2.jobTitle a::text").get("").strip()
+            if not title:
+                title = card.css("a.jcs-JobTitle::text").get("").strip()
             title = " ".join(title.split())
 
             url = card.css("h3.jobTitle a::attr(href)").get("").strip()

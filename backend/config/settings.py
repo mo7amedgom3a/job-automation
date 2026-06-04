@@ -13,13 +13,14 @@ from typing import Literal
 
 FetcherType = Literal["http", "dynamic", "stealth"]
 
-
+KEYWORDS = ["software engineer", "DevOps", "backend", "AWS", "terraform", "python", "Golang", "Full Stack", "Engineer", "Devloper", ".NET", "react", "frontend"]
 @dataclass
 class SiteConfig:
     name: str
     start_urls: list[str]
     fetcher: FetcherType = "http"
     enabled: bool = True
+    keywords: list[str] = field(default_factory=list)  # Dynamic job search keywords
     # Polite crawl settings (per-site overrides)
     concurrent_requests: int = 4
     concurrent_requests_per_domain: int = 2
@@ -84,7 +85,8 @@ SITES: list[SiteConfig] = [
     ),
     SiteConfig(
         name="linkedin",
-        start_urls=["https://www.linkedin.com/jobs/search?keywords=Software%20Engineer&location=Cairo&geoId=101131993&distance=25&f_TPR=r86400"],
+        start_urls=["https://www.linkedin.com/jobs/search?location=Cairo&geoId=101131993&distance=25&f_TPR=r86400"],
+        keywords=KEYWORDS,
         fetcher="stealth",
         download_delay=3.0,
         robots_txt_obey=False,
@@ -92,17 +94,24 @@ SITES: list[SiteConfig] = [
     ),
     SiteConfig(
         name="indeed",
-        start_urls=["https://www.indeed.com/jobs?q=%22software+engineer%22+OR+DevOps+OR+backend+OR+AWS+OR+terraform+OR+python+OR+Golang&l=&fromage=3&sc=0kf%3Aattr%28DSQF7%29%3B&from=searchOnDesktopSerp"],
-        fetcher="stealth",
+        start_urls=["https://www.indeed.com/m/jobs"],
+        keywords=KEYWORDS,
+        fetcher="http",
         download_delay=3.0,
         robots_txt_obey=False,
-        next_page_selector="a[aria-label='Next Page']::attr(href)",
-        extra_fetch_kwargs={"network_idle": True},
+        next_page_selector="a[data-dd-action-name='next-page']::attr(href), a[data-testid='pagination-page-next']::attr(href), a[aria-label='Next Page']::attr(href), a[aria-label='Next']::attr(href), a[aria-label*='Next']::attr(href)",
+        extra_fetch_kwargs={
+            "timeout": 30,
+            "headers": {
+                "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/123.0.0.0 Mobile/15E148 Safari/604.1"
+            }
+        },
     ),
     # ─── LinkedIn Country-Specific Usecases ────────────────────────────────────
     SiteConfig(
         name="linkedin_sa",
-        start_urls=["https://www.linkedin.com/jobs/search?keywords=%22Software%2BEngineer%22%2BOR%2BBackend%2BOR%2BDecOps%2BOr%2BPython%2BOR%2BGolang&location=Saudi%2BArabia&geoId=100459316&f_TPR=r86400&currentJobId=4421688413&position=4&pageNum=0"],
+        start_urls=["https://www.linkedin.com/jobs/search?location=Saudi%20Arabia&geoId=100459316&f_TPR=r86400"],
+        keywords=KEYWORDS,
         fetcher="stealth",
         download_delay=3.0,
         robots_txt_obey=False,
@@ -110,7 +119,8 @@ SITES: list[SiteConfig] = [
     ),
     SiteConfig(
         name="linkedin_eg",
-        start_urls=["https://www.linkedin.com/jobs/search?keywords=%22Software%20Engineer%22%20OR%20Backend%20OR%20DevOps%20OR%20AWS%20OR%20Cloud%20OR%20Python%20OR%20%22FUll%20AI%20Stack%22&location=Cairo&geoId=101131993&distance=25"],
+        start_urls=["https://www.linkedin.com/jobs/search?location=Cairo&geoId=101131993&distance=25"],
+        keywords=KEYWORDS,
         fetcher="stealth",
         download_delay=3.0,
         robots_txt_obey=False,
@@ -118,7 +128,8 @@ SITES: list[SiteConfig] = [
     ),
     SiteConfig(
         name="linkedin_ae",
-        start_urls=["https://www.linkedin.com/jobs/search?keywords=%22Software%20Engineer%22%20OR%20Backend%20OR%20DecOps%20Or%20Python%20OR%20Golang&location=United%20Arab%20Emirates&geoId=104305776&f_TPR=r86400&f_WT=2&position=1&pageNum=0"],
+        start_urls=["https://www.linkedin.com/jobs/search?location=United%20Arab%20Emirates&geoId=104305776&f_TPR=r86400"],
+        keywords=KEYWORDS,
         fetcher="stealth",
         download_delay=3.0,
         robots_txt_obey=False,
@@ -126,7 +137,8 @@ SITES: list[SiteConfig] = [
     ),
     SiteConfig(
         name="linkedin_barcelona",
-        start_urls=["https://www.linkedin.com/jobs/search?keywords=%22Software%20Engineer%22%20OR%20Backend%20OR%20DecOps%20Or%20Python%20OR%20Golang&location=Barcelona&geoId=107025191&f_TPR=r86400&f_WT=2&position=1&pageNum=0"],
+        start_urls=["https://www.linkedin.com/jobs/search?location=Barcelona&geoId=107025191&f_TPR=r86400"],
+        keywords=KEYWORDS,
         fetcher="stealth",
         download_delay=3.0,
         robots_txt_obey=False,
@@ -134,7 +146,8 @@ SITES: list[SiteConfig] = [
     ),
     SiteConfig(
         name="linkedin_germany",
-        start_urls=["https://www.linkedin.com/jobs/search?keywords=%22Software%20Engineer%22%20OR%20Backend%20OR%20DecOps%20Or%20Python%20OR%20Golang&location=Germany&geoId=101282230&f_TPR=r86400&f_WT=2&position=1&pageNum=0"],
+        start_urls=["https://www.linkedin.com/jobs/search?location=Germany&geoId=101282230&f_TPR=r86400"],
+        keywords=KEYWORDS,
         fetcher="stealth",
         download_delay=3.0,
         robots_txt_obey=False,
@@ -142,7 +155,8 @@ SITES: list[SiteConfig] = [
     ),
     SiteConfig(
         name="linkedin_poland",
-        start_urls=["https://www.linkedin.com/jobs/search?keywords=%22Software%20Engineer%22%20OR%20Backend%20OR%20DecOps%20Or%20Python%20OR%20Golang&location=Poland&geoId=105072130&f_TPR=r86400&f_WT=2&position=1&pageNum=0"],
+        start_urls=["https://www.linkedin.com/jobs/search?location=Poland&geoId=105072130&f_TPR=r86400"],
+        keywords=KEYWORDS,
         fetcher="stealth",
         download_delay=3.0,
         robots_txt_obey=False,
@@ -150,7 +164,8 @@ SITES: list[SiteConfig] = [
     ),
     SiteConfig(
         name="linkedin_spain",
-        start_urls=["https://www.linkedin.com/jobs/search?keywords=%22Software%20Engineer%22%20OR%20Backend%20OR%20DecOps%20Or%20Python%20OR%20Golang&location=Spain&geoId=105646813&f_TPR=r86400&f_WT=2&position=1&pageNum=0"],
+        start_urls=["https://www.linkedin.com/jobs/search?location=Spain&geoId=105646813&f_TPR=r86400"],
+        keywords=KEYWORDS,
         fetcher="stealth",
         download_delay=3.0,
         robots_txt_obey=False,
@@ -158,7 +173,8 @@ SITES: list[SiteConfig] = [
     ),
     SiteConfig(
         name="linkedin_canada",
-        start_urls=["https://www.linkedin.com/jobs/search?keywords=%22Software%20Engineer%22%20OR%20Backend%20OR%20DecOps%20Or%20Python%20OR%20Golang&location=Canada&geoId=101174742&f_TPR=r86400&f_WT=2&position=1&pageNum=0"],
+        start_urls=["https://www.linkedin.com/jobs/search?location=Canada&geoId=101174742&f_TPR=r86400"],
+        keywords=KEYWORDS,
         fetcher="stealth",
         download_delay=3.0,
         robots_txt_obey=False,
@@ -167,30 +183,48 @@ SITES: list[SiteConfig] = [
     # ─── Indeed Country-Specific Usecases ──────────────────────────────────────
     SiteConfig(
         name="indeed_eg",
-        start_urls=["https://eg.indeed.com/jobs?q=%22software+engineer%22+OR+backend+OR+DevOps+OR+AWS+OR+Cloud+OR+python+OR+Golang&l=Cairo"],
-        fetcher="stealth",
+        start_urls=["https://eg.indeed.com/m/jobs"],
+        keywords=KEYWORDS,
+        fetcher="http",
         download_delay=3.0,
         robots_txt_obey=False,
-        next_page_selector="a[aria-label='Next Page']::attr(href)",
-        extra_fetch_kwargs={"network_idle": True},
+        next_page_selector="a[data-dd-action-name='next-page']::attr(href), a[data-testid='pagination-page-next']::attr(href), a[aria-label='Next Page']::attr(href), a[aria-label='Next']::attr(href), a[aria-label*='Next']::attr(href)",
+        extra_fetch_kwargs={
+            "timeout": 30,
+            "headers": {
+                "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/123.0.0.0 Mobile/15E148 Safari/604.1"
+            }
+        },
     ),
     SiteConfig(
         name="indeed_sa",
-        start_urls=["https://sa.indeed.com/jobs?q=%22software+engineer%22+OR+backend+OR+DevOps+OR+AWS+OR+Cloud+OR+python+OR+Golang&l=%22remote%22"],
-        fetcher="stealth",
+        start_urls=["https://sa.indeed.com/m/jobs"],
+        keywords=KEYWORDS,
+        fetcher="http",
         download_delay=3.0,
         robots_txt_obey=False,
-        next_page_selector="a[aria-label='Next Page']::attr(href)",
-        extra_fetch_kwargs={"network_idle": True},
+        next_page_selector="a[data-dd-action-name='next-page']::attr(href), a[data-testid='pagination-page-next']::attr(href), a[aria-label='Next Page']::attr(href), a[aria-label='Next']::attr(href), a[aria-label*='Next']::attr(href)",
+        extra_fetch_kwargs={
+            "timeout": 30,
+            "headers": {
+                "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/123.0.0.0 Mobile/15E148 Safari/604.1"
+            }
+        },
     ),
     SiteConfig(
         name="indeed_ae",
-        start_urls=["https://ae.indeed.com/jobs?q=%22Software+Engineer%22+OR+backend+OR+DevOps+OR+AWS+OR+cloud+OR+Python+OR+%22FUll+Stack%22"],
-        fetcher="stealth",
+        start_urls=["https://ae.indeed.com/m/jobs"],
+        keywords=KEYWORDS,
+        fetcher="http",
         download_delay=3.0,
         robots_txt_obey=False,
-        next_page_selector="a[aria-label='Next Page']::attr(href)",
-        extra_fetch_kwargs={"network_idle": True},
+        next_page_selector="a[data-dd-action-name='next-page']::attr(href), a[data-testid='pagination-page-next']::attr(href), a[aria-label='Next Page']::attr(href), a[aria-label='Next']::attr(href), a[aria-label*='Next']::attr(href)",
+        extra_fetch_kwargs={
+            "timeout": 30,
+            "headers": {
+                "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/123.0.0.0 Mobile/15E148 Safari/604.1"
+            }
+        },
     ),
 ]
 
@@ -214,3 +248,13 @@ DEDUP_WINDOW_HOURS: int = int(os.getenv("DEDUP_WINDOW_HOURS", "24"))
 
 # Kept only for backwards-compatible function signatures in storage.db.
 SQLITE_DB_PATH: str = os.getenv("SQLITE_DB_PATH", "jobs.db")
+
+
+# ─── Central Aggregator & Limit Constants ───────────────────────────────────
+DEFAULT_SEARCH_LIMIT: int = 500
+MAX_SEARCH_LIMIT: int = 1000
+DEFAULT_SEARCH_OFFSET: int = 0
+DEFAULT_RECENT_HOURS: int = 72
+DEFAULT_INDEED_LIMIT: int = 50  # 0 = no limit, fetch all available within date range
+DEFAULT_MAX_PAGES: int = 0
+DEFAULT_MAX_CONCURRENT_SPIDERS: int = 2

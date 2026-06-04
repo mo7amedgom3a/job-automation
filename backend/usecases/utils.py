@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.absolute()))
 from config.settings import DATABASE_URL, SITES
 from scheduler.runner import run_cycle
 from storage.db import init_db, recent_jobs
-
+from config.settings import DEFAULT_INDEED_LIMIT
 # Setup logging
 logging.basicConfig(
     level=logging.INFO,
@@ -26,10 +26,10 @@ def run_usecase(site_name: str, output_filename: str) -> None:
     logger.info("Executing Use Case: %s", site_name.upper())
     logger.info("==================================================")
 
-    # 1. Setup dynamic overrides for 50-job target if indeed or linkedin
+    # 1. Setup dynamic overrides for 500-job target if indeed or linkedin
     if "indeed" in site_name:
         os.environ["INDEED_FROMAGE"] = "3"
-        os.environ["INDEED_LIMIT"] = "50"
+        os.environ["INDEED_LIMIT"] = str(DEFAULT_INDEED_LIMIT)
         logger.info("Configured Indeed constraints: 3 days, 50 jobs limit")
     elif "linkedin" in site_name:
         os.environ["LINKEDIN_TPR"] = "r86400"
@@ -39,11 +39,11 @@ def run_usecase(site_name: str, output_filename: str) -> None:
     for cfg in SITES:
         if cfg.name == site_name:
             if "indeed" in site_name:
-                cfg.max_pages = 5
-                logger.info("Overridden Indeed max_pages to 5")
+                cfg.max_pages = 500
+                logger.info("Overridden Indeed max_pages to 0 (unlimited)")
             elif "linkedin" in site_name:
-                cfg.max_pages = 5
-                logger.info("Overridden LinkedIn max_pages to 5")
+                cfg.max_pages = 500
+                logger.info("Overridden LinkedIn max_pages to 0 (unlimited)")
 
     logger.info("Database URL set to: %s", DATABASE_URL)
 

@@ -1,39 +1,39 @@
 services:
-  job-dork-api:
-    build:
-      context: ./backend
-    container_name: job-dork-api
-    restart: unless-stopped
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./backend:/app
-    env_file:
-      - ./backend/.env
-    environment:
-      PYTHONUNBUFFERED: "1"
-      DATABASE_URL: postgresql://job_user:job_password@postgres:5432/job_automation
-      REDIS_URL: redis://redis:6379/0
-      CACHE_REQUIRE_REDIS: "true"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - job_automation_net
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "python",
-          "-c",
-          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=5)",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 20s
+  # job-dork-api:
+  #   build:
+  #     context: ./backend
+  #   container_name: job-dork-api
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - ./backend:/app
+  #   env_file:
+  #     - ./backend/.env
+  #   environment:
+  #     PYTHONUNBUFFERED: "1"
+  #     DATABASE_URL: postgresql://job_user:job_password@postgres:5432/job_automation
+  #     REDIS_URL: redis://redis:6379/0
+  #     CACHE_REQUIRE_REDIS: "true"
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #   networks:
+  #     - job_automation_net
+  #   healthcheck:
+  #     test:
+  #       [
+  #         "CMD",
+  #         "python",
+  #         "-c",
+  #         "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=5)",
+  #       ]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 20s
 
   postgres:
     image: postgres:16-alpine

@@ -20,6 +20,7 @@ logger = logging.getLogger("job_aggregator.repository.jobs")
 
 
 DEFAULT_DATABASE_URL = "postgresql://job_user:job_password@postgres:5432/job_automation"
+from config.settings import DEFAULT_SEARCH_LIMIT, DEFAULT_SEARCH_OFFSET
 
 
 class JobRepository:
@@ -85,7 +86,7 @@ class JobRepository:
         source: str,
         dedup_window_hours: int = 24,
     ) -> tuple[bool, str]:
-        fingerprint = self.fingerprint(job)
+        fingerprint = self.fingerprint(job, source)
         if self.is_duplicate(fingerprint, dedup_window_hours=dedup_window_hours):
             return False, fingerprint
 
@@ -163,7 +164,104 @@ class JobRepository:
             rows = conn.execute(query, fingerprints).fetchall()
         return [dict(row) for row in rows]
 
+    def search_jobs(
+        self,
+        keywords: list[str] | None = None,
+        countries: list[str] | None = None,
+        company: str | None = None,
+        remote: bool | None = None,
+        limit: int = DEFAULT_SEARCH_LIMIT,
+        offset: int = DEFAULT_SEARCH_OFFSET,
+    ) -> tuple[list[dict], int]:
+        where_clauses = []
+        params = []
+        
+        if keywords:
+            keyword_clauses = []
+            for kw in keywords:
+                if kw.strip():
+                    keyword_clauses.append("(title ILIKE %s OR description ILIKE %s OR tags ILIKE %s)")
+                    like_pattern = f"%{kw.strip()}%"
+                    params.extend([like_pattern, like_pattern, like_pattern])
+            if keyword_clauses:
+                where_clauses.append("(" + " OR ".join(keyword_clauses) + ")")
+        
+        if countries:
+            country_expansion = {
+                "egypt": ["egypt", "cairo", "alexandria", "مصر", "\\_eg"],
+                "eg": ["egypt", "cairo", "alexandria", "مصر", "\\_eg"],
+                "saudi arabia": ["saudi", "riyadh", "jeddah", "السعودية", "\\_sa"],
+                "saudi": ["saudi", "riyadh", "jeddah", "السعودية", "\\_sa"],
+                "sa": ["saudi", "riyadh", "jeddah", "السعودية", "\\_sa"],
+                "united arab emirates": ["uae", "dubai", "abu dhabi", "united arab emirates", "الامارات", "\\_ae", "emirates"],
+                "uae": ["uae", "dubai", "abu dhabi", "united arab emirates", "الامارات", "\\_ae", "emirates"],
+                "ae": ["uae", "dubai", "abu dhabi", "united arab emirates", "الامارات", "\\_ae", "emirates"],
+                "emirates": ["uae", "dubai", "abu dhabi", "united arab emirates", "الامارات", "\\_ae", "emirates"],
+                "emarties": ["uae", "dubai", "abu dhabi", "united arab emirates", "الامارات", "\\_ae", "emirates"],
+                "germany": ["germany", "berlin", "munich", "frankfurt", "deutschland", "\\_germany"],
+                "de": ["germany", "berlin", "munich", "frankfurt", "deutschland", "\\_germany"],
+                "poland": ["poland", "warsaw", "krakow", "polska", "\\_poland"],
+                "pl": ["poland", "warsaw", "krakow", "polska", "\\_poland"],
+                "spain": ["spain", "barcelona", "madrid", "españa", "\\_spain", "\\_barcelona"],
+                "es": ["spain", "barcelona", "madrid", "españa", "\\_spain", "\\_barcelona"],
+                "canada": ["canada", "toronto", "vancouver", "montreal", "\\_canada"],
+                "ca": ["canada", "toronto", "vancouver", "montreal", "\\_canada"],
+                "united states": ["usa", "united states", "us", "new york", "san francisco", "california"],
+                "usa": ["usa", "united states", "us", "new york", "san francisco", "california"],
+                "us": ["usa", "united states", "us", "new york", "san francisco", "california"],
+                "united kingdom": ["uk", "united kingdom", "london", "england"],
+                "uk": ["uk", "united kingdom", "london", "england"],
+            }
+            country_clauses = []
+            for c in countries:
+                if c.strip():
+                    c_key = c.lower().strip()
+                    terms = country_expansion.get(c_key, [c.strip()])
+                    for term in terms:
+                        country_clauses.append("(location ILIKE %s OR tags ILIKE %s OR source ILIKE %s)")
+                        like_pattern = f"%{term}%"
+                        params.extend([like_pattern, like_pattern, like_pattern])
+            if country_clauses:
+                where_clauses.append("(" + " OR ".join(country_clauses) + ")")
+            
+        if company:
+            where_clauses.append("company ILIKE %s")
+            params.append(f"%{company}%")
+            
+        if remote is not None:
+            if remote:
+                where_clauses.append("(location ILIKE %s OR tags ILIKE %s OR title ILIKE %s)")
+                params.extend(["%remote%", "%remote%", "%remote%"])
+            else:
+                where_clauses.append("(location NOT ILIKE %s AND tags NOT ILIKE %s AND title NOT ILIKE %s)")
+                params.extend(["%remote%", "%remote%", "%remote%"])
+
+        where_str = ""
+        if where_clauses:
+            where_str = " AND " + " AND ".join(where_clauses)
+
+        # 1. Get total count
+        count_query = f"SELECT COUNT(*) as count FROM jobs WHERE 1=1{where_str}"
+        
+        # 2. Get paginated results
+        results_query = f"SELECT * FROM jobs WHERE 1=1{where_str} ORDER BY scraped_at DESC LIMIT %s OFFSET %s"
+        results_params = params + [limit, offset]
+
+        with self._connect() as conn:
+            # We run count first
+            count_row = conn.execute(count_query, params).fetchone()
+            total_count = int(count_row["count"]) if count_row else 0
+            
+            rows = conn.execute(results_query, results_params).fetchall()
+            jobs = [dict(row) for row in rows]
+            
+        return jobs, total_count
+
     @staticmethod
-    def fingerprint(job: dict) -> str:
-        raw = f"{job.get('url', '').strip().lower()}|{job.get('title', '').strip().lower()}"
+    def fingerprint(job: dict, source: str | None = None) -> str:
+        # Generate fingerprint based on job title, company, and source to prevent duplicates in aggregation
+        title = (job.get("title") or "").strip().lower()
+        company = (job.get("company") or "").strip().lower()
+        src = (source or job.get("source") or job.get("site") or "").strip().lower()
+        raw = f"{title}|{company}|{src}"
         return hashlib.sha1(raw.encode()).hexdigest()

@@ -383,3 +383,111 @@
   background: rgba(0, 212, 255, 0.15);
   color: var(--jd-cyan);
 }
+
+/* Dynamic results grouping */
+.jd-grouped-results {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.jd-country-section {
+  background: var(--jd-surface);
+  border: 1px solid var(--jd-border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+}
+
+.jd-country-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  background: linear-gradient(90deg, var(--jd-surface-2), var(--jd-surface));
+  border-bottom: 1px solid var(--jd-border);
+}
+
+.jd-country-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--jd-text);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.jd-country-header h2 .flag {
+  font-size: 24px;
+}
+
+.jd-country-header .badge {
+  font-family: "DM Mono", monospace;
+  font-size: 12px;
+  color: var(--jd-cyan);
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+.jd-job-boards {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.jd-board-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.jd-board-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--jd-border-strong);
+}
+
+.jd-platform-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--jd-text);
+  display: flex;
+  align-items: center;
+  text-transform: capitalize;
+}
+
+.jd-board-header .board-badge {
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  color: var(--jd-muted);
+}
+
+/* Pagination styling */
+.jd-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--jd-border);
+}
+
+.jd-page-info {
+  font-family: "DM Mono", monospace;
+  font-size: 14px;
+  color: var(--jd-muted);
+}
+
+.jd-page-info b {
+  color: var(--jd-cyan);
+}
+
+
