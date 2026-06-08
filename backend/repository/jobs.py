@@ -87,6 +87,12 @@ class JobRepository:
         dedup_window_hours: int = 24,
     ) -> tuple[bool, str]:
         fingerprint = self.fingerprint(job, source)
+
+        from services.filters import is_blacklisted_title
+        if is_blacklisted_title(job.get("title")):
+            logger.info("Dropping non-software job: %s", job.get("title"))
+            return False, fingerprint
+
         if self.is_duplicate(fingerprint, dedup_window_hours=dedup_window_hours):
             return False, fingerprint
 
@@ -162,6 +168,48 @@ class JobRepository:
         query = f"SELECT * FROM jobs WHERE fingerprint IN ({placeholders})"
         with self._connect() as conn:
             rows = conn.execute(query, fingerprints).fetchall()
+        return [dict(row) for row in rows]
+
+    def delete_old_jobs(
+        self,
+        days: int | None = None,
+        hours: int | None = None,
+        minutes: int | None = None,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        truncate: bool = False,
+    ) -> list[dict]:
+        """Deletes jobs based on relative age, date range, or truncates the table."""
+        if truncate:
+            query = "DELETE FROM jobs RETURNING *"
+            params = ()
+        elif start_date is not None or end_date is not None:
+            clauses = []
+            params_list = []
+            if start_date is not None:
+                clauses.append("scraped_at >= %s")
+                params_list.append(start_date)
+            if end_date is not None:
+                clauses.append("scraped_at <= %s")
+                params_list.append(end_date)
+            query = f"DELETE FROM jobs WHERE {' AND '.join(clauses)} RETURNING *"
+            params = tuple(params_list)
+        else:
+            # Default fallback to 2 days if no options are specified
+            if days is None and hours is None and minutes is None:
+                days = 2
+            
+            delta = timedelta(
+                days=days or 0,
+                hours=hours or 0,
+                minutes=minutes or 0,
+            )
+            cutoff = datetime.now(timezone.utc) - delta
+            query = "DELETE FROM jobs WHERE scraped_at < %s RETURNING *"
+            params = (cutoff,)
+
+        with self._connect() as conn:
+            rows = conn.execute(query, params).fetchall()
         return [dict(row) for row in rows]
 
     def search_jobs(

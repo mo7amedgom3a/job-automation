@@ -241,6 +241,109 @@ None.
 
 ---
 
+### 8. Get Supported Countries and Job Boards
+* **Endpoint:** `GET /search/countries`
+* **Summary:** Get Supported Countries and Job Boards.
+* **Description:** Returns a dictionary of supported countries, their display names, available job boards, and the specific spiders associated with them.
+* **Why we need this in the Frontend:**
+  The frontend uses this endpoint to dynamically populate the country and job board selector dropdowns. By fetching the valid country-to-job-board mapping, the frontend can ensure that users can only select and trigger `/search/aggregate/sub` requests for combinations that are actually backed by active spiders (e.g., preventing a user from triggering sub-aggregation for `"Poland"` on `"indeed"` when only `"linkedin"` is supported for Poland). The frontend can then dynamically change the body of the `POST /search/aggregate/sub` payload to match the selected `country` and `job_board`.
+
+#### Response (`CountriesResponse`)
+```json
+{
+  "countries": {
+    "egypt": {
+      "name": "Egypt",
+      "job_boards": [
+        "linkedin",
+        "indeed"
+      ],
+      "spiders": [
+        "linkedin_eg",
+        "indeed_eg"
+      ]
+    },
+    "germany": {
+      "name": "Germany",
+      "job_boards": [
+        "linkedin",
+        "indeed"
+      ],
+      "spiders": [
+        "linkedin_germany",
+        "indeed_germany"
+      ]
+    },
+    "united kingdom": {
+      "name": "United Kingdom",
+      "job_boards": [
+        "linkedin",
+        "indeed"
+      ],
+      "spiders": [
+        "linkedin_uk",
+        "indeed_uk"
+      ]
+    },
+    "poland": {
+      "name": "Poland",
+      "job_boards": [
+        "linkedin"
+      ],
+      "spiders": [
+        "linkedin_poland"
+      ]
+    }
+  }
+}
+```
+
+---
+
+### 9. Delete Old or All Jobs
+* **Endpoint:** `DELETE /jobs/old`
+* **Summary:** Remove Old Jobs.
+* **Description:** Deletes job listings from the database. It supports relative time thresholds (`days`, `hours`, `minutes`), specific date ranges (`start_date`, `end_date`), or table truncation (`truncate`). Returns the count and details of the deleted job items.
+* **Parameters (Query):**
+  * `days` (integer, optional): Number of days threshold. Jobs scraped older than this number of days will be deleted.
+  * `hours` (integer, optional): Number of hours threshold. Jobs scraped older than this number of hours will be deleted.
+  * `minutes` (integer, optional): Number of minutes threshold. Jobs scraped older than this number of minutes will be deleted.
+  * `start_date` (string, optional): Start date/time in ISO-8601 format (inclusive). If specified, jobs scraped on or after this date will be deleted. E.g. `2026-06-08T00:00:00Z` or `2026-06-08T00:00:00`.
+  * `end_date` (string, optional): End date/time in ISO-8601 format (inclusive). If specified, jobs scraped on or before this date will be deleted. E.g. `2026-06-08T23:59:59Z` or `2026-06-08T23:59:59`.
+  * `truncate` (boolean, default: `false`): If set to `true`, ignores relative time and ranges, and deletes all jobs from the table (useful before inserting new jobs).
+
+#### Deletion Modes & Logic:
+1. **Table Wipe (Truncation)**: When `truncate=true`, all jobs are deleted from the database.
+2. **Date/Time Range**: If either `start_date` or `end_date` is provided, jobs within the specified boundary are deleted.
+3. **Relative Age (Default)**: If neither truncate nor a range is provided, jobs older than the relative time threshold (calculated as `days` + `hours` + `minutes` ago) are deleted. If no relative parameters are supplied, it defaults to deleting jobs older than 2 days.
+
+#### Request Body
+None.
+
+#### Response (`DeleteOldJobsResponse`)
+```json
+{
+  "deleted_count": 1,
+  "deleted_jobs": [
+    {
+      "id": "2d1bc023de6143c08ec2027e1f7c5e2d",
+      "title": "Old Backend Engineer",
+      "company": "Legacy Corp",
+      "url": "https://example.com/jobs/1",
+      "description": "Maintain legacy systems",
+      "location": "Cairo, Egypt",
+      "salary": "N/A",
+      "source": "linkedin_eg",
+      "site": "linkedin_eg",
+      "tags": ["python", "django"],
+      "scraped_at": "2026-06-01T10:00:00+00:00"
+    }
+  ]
+}
+```
+
+---
+
 ## Detailed Use Cases: Remote vs Onsite Jobs
 
 The job scraping engine adapts its routing and search dork templates based on whether the query represents a **Remote** or **Onsite** job search.

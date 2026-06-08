@@ -3,7 +3,7 @@ import json
 from typing import Any
 
 from models.job import SearchRequest, JobSearchRequest, SubAggregateRequest
-from routes.search import search_aggregate, run_full_aggregation, search_jobs, search_sub_aggregate, run_sub_aggregation, find_matching_spiders
+from routes.search import search_aggregate, run_full_aggregation, search_jobs, search_sub_aggregate, run_sub_aggregation, find_matching_spiders, get_supported_countries
 from cache.cache import DeduplicationCache
 from repository.jobs import JobRepository
 from services.orchestrator import JobOrchestrator
@@ -193,6 +193,18 @@ def test_find_matching_spiders() -> None:
     spiders = find_matching_spiders("germany", "linkedin")
     assert "linkedin_germany" in spiders
 
+    # Test Germany + Indeed -> indeed_germany
+    spiders = find_matching_spiders("germany", "indeed")
+    assert "indeed_germany" in spiders
+
+    # Test UK + LinkedIn -> linkedin_uk
+    spiders = find_matching_spiders("united kingdom", "linkedin")
+    assert "linkedin_uk" in spiders
+
+    # Test UK (short) + Indeed -> indeed_uk
+    spiders = find_matching_spiders("uk", "indeed")
+    assert "indeed_uk" in spiders
+
     # Test invalid country
     spiders = find_matching_spiders("nonexistent", "linkedin")
     assert not spiders
@@ -320,3 +332,29 @@ def test_fingerprint_dedup() -> None:
     job3 = {"title": "DevOps Engineer", "company": "Google"}
     fp4 = JobRepository.fingerprint(job3, source="linkedin")
     assert fp1 != fp4
+
+
+@pytest.mark.asyncio
+async def test_get_supported_countries() -> None:
+    # Act
+    response = await get_supported_countries()
+    
+    # Assert
+    assert response.countries is not None
+    assert "egypt" in response.countries
+    assert "germany" in response.countries
+    assert "united kingdom" in response.countries
+    
+    egy_info = response.countries["egypt"]
+    assert egy_info.name == "Egypt"
+    assert "linkedin" in egy_info.job_boards
+    assert "indeed" in egy_info.job_boards
+    assert "linkedin_eg" in egy_info.spiders
+    assert "indeed_eg" in egy_info.spiders
+    
+    uk_info = response.countries["united kingdom"]
+    assert uk_info.name == "United Kingdom"
+    assert "linkedin" in uk_info.job_boards
+    assert "indeed" in uk_info.job_boards
+    assert "linkedin_uk" in uk_info.spiders
+    assert "indeed_uk" in uk_info.spiders

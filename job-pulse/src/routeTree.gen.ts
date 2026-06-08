@@ -9,8 +9,26 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ControlRouteImport } from './routes/control'
+import { Route as CleanupRouteImport } from './routes/cleanup'
+import { Route as AggregationRouteImport } from './routes/aggregation'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ControlRoute = ControlRouteImport.update({
+  id: '/control',
+  path: '/control',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CleanupRoute = CleanupRouteImport.update({
+  id: '/cleanup',
+  path: '/cleanup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AggregationRoute = AggregationRouteImport.update({
+  id: '/aggregation',
+  path: '/aggregation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +37,61 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/aggregation': typeof AggregationRoute
+  '/cleanup': typeof CleanupRoute
+  '/control': typeof ControlRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/aggregation': typeof AggregationRoute
+  '/cleanup': typeof CleanupRoute
+  '/control': typeof ControlRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/aggregation': typeof AggregationRoute
+  '/cleanup': typeof CleanupRoute
+  '/control': typeof ControlRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/aggregation' | '/cleanup' | '/control'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/aggregation' | '/cleanup' | '/control'
+  id: '__root__' | '/' | '/aggregation' | '/cleanup' | '/control'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AggregationRoute: typeof AggregationRoute
+  CleanupRoute: typeof CleanupRoute
+  ControlRoute: typeof ControlRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/control': {
+      id: '/control'
+      path: '/control'
+      fullPath: '/control'
+      preLoaderRoute: typeof ControlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cleanup': {
+      id: '/cleanup'
+      path: '/cleanup'
+      fullPath: '/cleanup'
+      preLoaderRoute: typeof CleanupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aggregation': {
+      id: '/aggregation'
+      path: '/aggregation'
+      fullPath: '/aggregation'
+      preLoaderRoute: typeof AggregationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,6 +104,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AggregationRoute: AggregationRoute,
+  CleanupRoute: CleanupRoute,
+  ControlRoute: ControlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

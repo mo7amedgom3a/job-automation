@@ -12,7 +12,7 @@ export const PRESETS: Preset[] = [
     label: "🌍 Egypt · DevOps",
     patch: {
       keywords: ["devops", "software engineer"],
-      country: "egypt",
+      countries: ["egypt"],
       remote: null,
       limit: 50,
       offset: 0,
@@ -23,7 +23,7 @@ export const PRESETS: Preset[] = [
     label: "🌐 Global Remote · Backend",
     patch: {
       keywords: ["backend engineer", "python", "go"],
-      country: null,
+      countries: [],
       remote: true,
       limit: 50,
       offset: 0,
@@ -34,7 +34,7 @@ export const PRESETS: Preset[] = [
     label: "🏢 Germany · Frontend",
     patch: {
       keywords: ["frontend developer", "react"],
-      country: "germany",
+      countries: ["germany"],
       remote: false,
       limit: 50,
       offset: 0,

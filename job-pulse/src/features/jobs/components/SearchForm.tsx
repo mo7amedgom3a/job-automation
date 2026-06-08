@@ -3,6 +3,17 @@ import type { FormState } from "../types";
 
 const COUNTRIES = ["USA", "Egypt", "Saudi Arabia", "UAE", "Qatar", "Kuwait", "Bahrain", "Oman", "UK", "Germany", "Canada"];
 
+const SUGGESTED_KEYWORDS = [
+  "backend engineer",
+  "python",
+  "Engineer",
+  "Full Stack",
+  "DevOps",
+  "Software",
+  "AI",
+  "Developer",
+];
+
 interface Props {
   value: FormState;
   onChange: (patch: Partial<FormState>) => void;
@@ -30,6 +41,14 @@ export function SearchForm({ value, onChange, onSubmit, loading }: Props) {
         ? value.countries.filter((x) => x !== norm)
         : [...value.countries, norm],
     });
+  };
+
+  const toggleKeyword = (kw: string) => {
+    if (value.keywords.includes(kw)) {
+      onChange({ keywords: value.keywords.filter((x) => x !== kw) });
+    } else {
+      onChange({ keywords: [...value.keywords, kw] });
+    }
   };
 
 
@@ -71,6 +90,23 @@ export function SearchForm({ value, onChange, onSubmit, loading }: Props) {
               }}
               placeholder={value.keywords.length ? "" : 'e.g. "DevOps", "FastAPI", "Go" — press Enter to add'}
             />
+          </div>
+          <div className="jd-keyword-suggestions">
+            <span className="jd-suggestion-title">Suggestions:</span>
+            {SUGGESTED_KEYWORDS.map((kw) => {
+              const active = value.keywords.includes(kw);
+              return (
+                <button
+                  key={kw}
+                  type="button"
+                  onClick={() => toggleKeyword(kw)}
+                  className={`jd-suggestion-chip ${active ? "active" : ""}`}
+                >
+                  {active ? "✓ " : "+ "}
+                  {kw}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>

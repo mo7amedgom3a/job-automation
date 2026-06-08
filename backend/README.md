@@ -2,6 +2,9 @@
 
 A layered FastAPI backend for job aggregation. It combines Google dork searches, custom Scrapling spiders, PostgreSQL persistence, Redis URL deduplication, and native JSON API integrations.
 
+> [!NOTE]
+> For a detailed reference on all backend HTTP endpoints, parameter schemas, and API usage, see the [API Reference Guide](file:///home/mohamed/job-automation/backend/API_README.md).
+
 ---
 
 ## Architecture Overview

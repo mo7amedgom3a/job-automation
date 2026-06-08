@@ -440,7 +440,9 @@ class LinkedInSpider(BaseJobSpider):
 
         # Use keywords from site_config, or fallback to env var
         if self.site_config.keywords:
-            keywords = os.getenv("LINKEDIN_KEYWORDS", " ".join(self.site_config.keywords))
+            formatted_keywords = [f'"{kw}"' if ' ' in kw else kw for kw in self.site_config.keywords]
+            default_query = " OR ".join(formatted_keywords)
+            keywords = os.getenv("LINKEDIN_KEYWORDS", default_query)
         else:
             keywords = os.getenv("LINKEDIN_KEYWORDS", params.get("keywords", KEYWORDS)[0])
         location = os.getenv("LINKEDIN_LOCATION", params.get("location", ["Cairo"])[0])
@@ -683,6 +685,9 @@ class LinkedInBarcelonaSpider(LinkedInSpider):
 class LinkedInGermanySpider(LinkedInSpider):
     site_config = _cfg("linkedin_germany")
 
+class LinkedInUKSpider(LinkedInSpider):
+    site_config = _cfg("linkedin_uk")
+
 class LinkedInPolandSpider(LinkedInSpider):
     site_config = _cfg("linkedin_poland")
 
@@ -700,6 +705,12 @@ class IndeedSASpider(IndeedSpider):
 
 class IndeedAESpider(IndeedSpider):
     site_config = _cfg("indeed_ae")
+
+class IndeedUKSpider(IndeedSpider):
+    site_config = _cfg("indeed_uk")
+
+class IndeedGermanySpider(IndeedSpider):
+    site_config = _cfg("indeed_germany")
 
 
 # ─── Registry ─────────────────────────────────────────────────────────────────
@@ -719,12 +730,15 @@ ALL_SPIDERS: dict[str, type[BaseJobSpider]] = {
     "linkedin_ae":      LinkedInAESpider,
     "linkedin_barcelona": LinkedInBarcelonaSpider,
     "linkedin_germany": LinkedInGermanySpider,
+    "linkedin_uk":      LinkedInUKSpider,
     "linkedin_poland":  LinkedInPolandSpider,
     "linkedin_spain":   LinkedInSpainSpider,
     "linkedin_canada":  LinkedInCanadaSpider,
     "indeed_eg":        IndeedEGSpider,
     "indeed_sa":        IndeedSASpider,
     "indeed_ae":        IndeedAESpider,
+    "indeed_uk":        IndeedUKSpider,
+    "indeed_germany":   IndeedGermanySpider,
 }
 
 

@@ -19,6 +19,7 @@ load_dotenv()
 from dependencies import get_job_repository
 from routes.cache import router as cache_router
 from routes.health import router as health_router
+from routes.jobs import router as jobs_router
 from routes.queries import router as queries_router
 from routes.search import router as search_router
 
@@ -48,6 +49,7 @@ def create_app() -> FastAPI:
     app.include_router(search_router)
     app.include_router(queries_router)
     app.include_router(cache_router)
+    app.include_router(jobs_router)
 
     @app.on_event("startup")
     async def startup() -> None:

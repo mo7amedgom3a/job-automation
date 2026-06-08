@@ -24,6 +24,7 @@ BLACKLISTED_COMPANIES = [
     "jobgether",
     "jobright.ai",
     "hire feed",
+    "Hire Feed", 
     "revolut",
     "hired",
 ]
@@ -124,3 +125,52 @@ def is_within_3_days(date_str: str | None) -> bool:
         pass
 
     return True
+
+
+def is_blacklisted_title(title: str | None) -> bool:
+    """Checks if a job title is not related to the software field (e.g. Waiter, Electrical, Sales)."""
+    if not title:
+        return False
+    title_lower = title.lower().strip()
+
+    patterns = [
+        # Explicit user list
+        r"\bwaiter\b", r"\bwaitress\b",
+        r"\belectrical\b", r"\belectrician\b",
+        r"\bdraftsman\b", r"\bdraftsmen\b",
+        r"\bdraftsperson\b",
+        r"\baluminium\b", r"\baluminum\b",
+        r"\bdrainage\b",
+        r"\bmarketing\b",
+        r"\breal\s*estate\b",
+        r"\bproperty\b",
+        r"\bmetal\b",
+        r"\blight\b",
+        r"\bmaterials\b",
+        r"\bconstruction\b",
+        r"\bmep\b",
+        r"\bland\b",
+        r"\bland\s+sales\b",
+        r"\bsales\b",
+        r"\bcivil\b",
+        
+
+        # Common construction/non-software leaks
+        r"\bplumbing\b", r"\bplumber\b",
+        r"\bpiping\b",
+        r"\bhvac\b",
+        r"\bmechanical\b",
+        r"\bquantity\s+surveyor\b",
+        r"\bdriver\b", r"\bstorekeeper\b", r"\bwarehouse\b",
+        r"\baccountant\b", r"\baccounting\b",
+        r"\bhr\b", r"\bhuman\s+resources\b",
+        r"\bnurse\b", r"\bdoctor\b", r"\bpharmacist\b",
+        r"\bchef\b", r"\bcook\b",
+    ]
+
+    for pattern in patterns:
+        if re.search(pattern, title_lower):
+            return True
+
+    return False
+

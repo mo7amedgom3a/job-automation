@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, BackgroundTasks
 
 from cache.cache import DeduplicationCache
 from dependencies import get_cache, get_google_job_search_service, get_orchestrator, get_job_repository
-from models.job import SearchRequest, SearchResponse, JobSearchRequest, CountryGroup, PaginatedSearchResponse, SubAggregateRequest
+from models.job import SearchRequest, SearchResponse, JobSearchRequest, CountryGroup, PaginatedSearchResponse, SubAggregateRequest, CountryInfo, CountriesResponse
 from repository.jobs import JobRepository
 from services.google_search import GoogleJobSearchService
 from services.orchestrator import JobOrchestrator
@@ -31,6 +31,8 @@ def resolve_country(job: dict) -> str:
         return "United Arab Emirates"
     if "germany" in source:
         return "Germany"
+    if "uk" in source:
+        return "United Kingdom"
     if "poland" in source:
         return "Poland"
     if "canada" in source:
@@ -288,6 +290,9 @@ def find_matching_spiders(country: str, job_board: str) -> list[str]:
         "barcelona": ["barcelona", "spain"],
         "canada": ["canada", "ca"],
         "ca": ["canada", "ca"],
+        "united kingdom": ["uk", "gb", "united kingdom"],
+        "uk": ["uk", "gb", "united kingdom"],
+        "gb": ["uk", "gb", "united kingdom"],
     }
     
     country_targets = country_mappings.get(c, [c])
@@ -411,3 +416,42 @@ async def search_sub_aggregate(
         repository=repository
     )
     return {"status": "initiated", "message": f"Sub-aggregation process started in the background for {req.job_board} in {req.country}."}
+
+
+@router.get(
+    "/countries",
+    response_model=CountriesResponse,
+    summary="Get Supported Countries and Job Boards",
+    description="Returns a dictionary of supported countries, their display names, available job boards, and the specific spiders associated with them.",
+)
+async def get_supported_countries() -> CountriesResponse:
+    # List of base country slugs/names mapped to display names
+    country_list = [
+        ("egypt", "Egypt"),
+        ("saudi arabia", "Saudi Arabia"),
+        ("united arab emirates", "United Arab Emirates"),
+        ("germany", "Germany"),
+        ("united kingdom", "United Kingdom"),
+        ("poland", "Poland"),
+        ("spain", "Spain"),
+        ("canada", "Canada"),
+    ]
+    job_boards = ["linkedin", "indeed"]
+    
+    country_info_dict = {}
+    for slug, display_name in country_list:
+        matched_boards = []
+        matched_spiders = []
+        for jb in job_boards:
+            spiders = find_matching_spiders(slug, jb)
+            if spiders:
+                matched_boards.append(jb)
+                matched_spiders.extend(spiders)
+        
+        country_info_dict[slug] = CountryInfo(
+            name=display_name,
+            job_boards=matched_boards,
+            spiders=matched_spiders
+        )
+        
+    return CountriesResponse(countries=country_info_dict)

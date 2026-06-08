@@ -6,13 +6,12 @@ import { PRESETS } from "./presets";
 import { isEmpty, SITE_LABEL } from "./utils";
 import { TopNav } from "./components/TopNav";
 import { SearchForm } from "./components/SearchForm";
-import { JobCard } from "./components/JobCard";
+import { CountrySection } from "./components/CountrySection";
 import { SkeletonGrid } from "./components/SkeletonGrid";
 import { EmptyState } from "./components/EmptyState";
 import { ErrorState } from "./components/ErrorState";
 import { FilterSidebar, type ClientFilters } from "./components/FilterSidebar";
-import linkedinIcon from "@/asset/linkedin.svg";
-import indeedIcon from "@/asset/indeed.svg";
+
 
 const INITIAL: FormState = {
   keywords: [],
@@ -59,6 +58,7 @@ export function JobDorkApp() {
   const [filters, setFilters] = useState<ClientFilters>(EMPTY_FILTERS);
   const [view, setView] = useState<"search" | "results">("search");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [activeCountryTab, setActiveCountryTab] = useState<string>("all");
   const ctrlRef = useRef<AbortController | null>(null);
 
   const patchForm = useCallback((p: Partial<FormState>) => setForm((f) => ({ ...f, ...p })), []);
@@ -74,6 +74,7 @@ export function JobDorkApp() {
     setView("results");
     if (currentForm.offset === 0) {
       setFilters(EMPTY_FILTERS);
+      setActiveCountryTab("all");
     }
     try {
       const data = await postJobSearch(currentForm, ctrl.signal);
@@ -88,7 +89,7 @@ export function JobDorkApp() {
           total = typeof data.total === "number" ? data.total : 0;
         } else if (Array.isArray(data)) {
           parsedResults = data;
-          total = data.reduce((acc, cg) => acc + (cg.job_boards?.reduce((acc2, jb) => acc2 + (jb.jobs?.length || 0), 0) || 0), 0);
+          total = (data as CountryGroup[]).reduce((acc: number, cg) => acc + (cg.job_boards?.reduce((acc2: number, jb) => acc2 + (jb.jobs?.length || 0), 0) || 0), 0);
         }
       }
       
@@ -249,6 +250,43 @@ export function JobDorkApp() {
     return groups;
   }, [results, visible, sort]);
 
+  // Derived: virtual country group for all Remote jobs across all countries
+  const remoteGroupVisible = useMemo<CountryGroup | null>(() => {
+    const remoteJobs = visible.filter(
+      (j) => j.is_remote || (j.location && j.location.toLowerCase().includes("remote"))
+    );
+
+    if (remoteJobs.length === 0) return null;
+
+    const boardsMap: Record<string, Job[]> = {};
+    remoteJobs.forEach((j) => {
+      const sourceName = j.site || j.source || "Other";
+      if (!boardsMap[sourceName]) {
+        boardsMap[sourceName] = [];
+      }
+      boardsMap[sourceName].push(j);
+    });
+
+    const job_boards = Object.entries(boardsMap).map(([name, jobs]) => ({
+      name,
+      jobs,
+    }));
+
+    return {
+      country: "Remote",
+      job_boards,
+    };
+  }, [visible]);
+
+  const remoteJobsCount = useMemo(() => {
+    if (!remoteGroupVisible) return 0;
+    return remoteGroupVisible.job_boards.reduce((acc, jb) => acc + jb.jobs.length, 0);
+  }, [remoteGroupVisible]);
+
+  const showCountryTabs = useMemo(() => {
+    return groupedVisible.length > 1 || (groupedVisible.length > 0 && remoteJobsCount > 0);
+  }, [groupedVisible, remoteJobsCount]);
+
   // Active filter pills
   const activePills = useMemo(() => {
     const pills: { id: string; label: string; remove: () => void }[] = [];
@@ -385,23 +423,25 @@ export function JobDorkApp() {
                 )}
               </div>
               <div className="spacer" />
-              <div className="jd-view-toggle">
-                <button className={layout === "grid" ? "active" : ""} onClick={() => setLayout("grid")} title="Grid">
-                  ▦
-                </button>
-                <button className={layout === "list" ? "active" : ""} onClick={() => setLayout("list")} title="List">
-                  ≡
-                </button>
+              <div className="jd-toolbar-controls">
+                <div className="jd-view-toggle">
+                  <button className={layout === "grid" ? "active" : ""} onClick={() => setLayout("grid")} title="Grid">
+                    ▦
+                  </button>
+                  <button className={layout === "list" ? "active" : ""} onClick={() => setLayout("list")} title="List">
+                    ≡
+                  </button>
+                </div>
+                <select
+                  className="jd-select mono"
+                  style={{ width: "auto" }}
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value as Sort)}
+                >
+                  <option value="date">Date Posted</option>
+                  <option value="company">Company (A→Z)</option>
+                </select>
               </div>
-              <select
-                className="jd-select mono"
-                style={{ width: "auto" }}
-                value={sort}
-                onChange={(e) => setSort(e.target.value as Sort)}
-              >
-                <option value="date">Date Posted</option>
-                <option value="company">Company (A→Z)</option>
-              </select>
             </div>
 
             {activePills.length > 0 && (
@@ -425,75 +465,64 @@ export function JobDorkApp() {
 
             {status === "loading" && <SkeletonGrid layout={layout} />}
             {status === "error" && <ErrorState message={error} onRetry={runSearch} />}
-            {status === "success" && groupedVisible.length === 0 && (
-              <EmptyState onAdjust={() => setView("search")} />
-            )}
-            {status === "success" && groupedVisible.length > 0 && (
-              <div className="jd-grouped-results">
+            {status === "success" && showCountryTabs && (
+              <div className="jd-country-tabs" role="tablist" aria-label="Filter by Country">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeCountryTab === "all"}
+                  className={`jd-country-tab ${activeCountryTab === "all" ? "active" : ""}`}
+                  onClick={() => setActiveCountryTab("all")}
+                >
+                  <span>🌍 All Countries</span>
+                  <span className="jd-country-tab-badge">{visible.length}</span>
+                </button>
+                
                 {groupedVisible.map((cg) => {
                   const flag = COUNTRY_FLAGS[cg.country.toLowerCase()] || "🌐";
-                  const totalJobsInCountry = cg.job_boards.reduce((acc, jb) => acc + jb.jobs.length, 0);
+                  const count = cg.job_boards.reduce((acc, jb) => acc + jb.jobs.length, 0);
+                  const countryId = cg.country.toLowerCase();
                   return (
-                    <section key={cg.country} className="jd-country-section">
-                      <div className="jd-country-header">
-                        <h2>
-                          <span className="flag">{flag}</span> {cg.country}
-                        </h2>
-                        <span className="badge">{totalJobsInCountry} jobs</span>
-                      </div>
-
-                      <div className="jd-job-boards">
-                        {cg.job_boards.map((jb) => {
-                          const siteClass = jb.name.toLowerCase();
-                          const platformLabel = SITE_LABEL[siteClass] ?? jb.name;
-                          return (
-                            <div key={jb.name} className="jd-board-section">
-                              <div className="jd-board-header">
-                                <span className={`jd-platform-title ${siteClass}`}>
-                                  {siteClass === "linkedin" && (
-                                    <img
-                                      src={linkedinIcon}
-                                      className="jd-platform-icon"
-                                      alt=""
-                                      style={{ width: "14px", height: "14px", marginRight: "6px" }}
-                                    />
-                                  )}
-                                  {siteClass === "indeed" && (
-                                    <img
-                                      src={indeedIcon}
-                                      className="jd-platform-icon"
-                                      alt=""
-                                      style={{ width: "14px", height: "14px", marginRight: "6px" }}
-                                    />
-                                  )}
-                                  {platformLabel}
-                                </span>
-                                <span className="board-badge">{jb.jobs.length} roles</span>
-                              </div>
-                              <div className={`jd-cards ${layout}`}>
-                                {jb.jobs.map((j, i) => (
-                                  <JobCard key={`${j.site}-${j.id}-${i}`} job={j} index={i} layout={layout} />
-                                ))}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </section>
+                    <button
+                      key={cg.country}
+                      type="button"
+                      role="tab"
+                      aria-selected={activeCountryTab === countryId}
+                      className={`jd-country-tab ${activeCountryTab === countryId ? "active" : ""}`}
+                      onClick={() => setActiveCountryTab(countryId)}
+                    >
+                      <span>{flag} {cg.country}</span>
+                      <span className="jd-country-tab-badge">{count}</span>
+                    </button>
                   );
                 })}
+
+                {remoteJobsCount > 0 && (
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeCountryTab === "remote"}
+                    className={`jd-country-tab ${activeCountryTab === "remote" ? "active" : ""}`}
+                    onClick={() => setActiveCountryTab("remote")}
+                  >
+                    <span>💻 Remote</span>
+                    <span className="jd-country-tab-badge">{remoteJobsCount}</span>
+                  </button>
+                )}
               </div>
             )}
 
-            {status === "success" && (groupedVisible.length > 0 || form.offset > 0) && (
-              <div className="jd-pagination">
+            {/* Top Pagination controls */}
+            {(status === "success" || status === "loading") && (groupedVisible.length > 0 || form.offset > 0) && (
+              <div className="jd-pagination top-pagination">
                 <button
                   type="button"
                   className="jd-btn"
                   disabled={form.offset === 0 || status === "loading"}
                   onClick={() => handlePageChange(form.offset - form.limit)}
                 >
-                  ← Previous Page
+                  <span className="hide-mobile">← Previous Page</span>
+                  <span className="show-mobile">← Prev</span>
                 </button>
                 <span className="jd-page-info">
                   Page <b>{Math.floor(form.offset / form.limit) + 1}</b> of <b>{Math.max(1, Math.ceil(totalJobs / form.limit))}</b>
@@ -504,10 +533,50 @@ export function JobDorkApp() {
                   disabled={form.offset + form.limit >= totalJobs || status === "loading"}
                   onClick={() => handlePageChange(form.offset + form.limit)}
                 >
-                  Next Page →
+                  <span className="hide-mobile">Next Page →</span>
+                  <span className="show-mobile">Next →</span>
                 </button>
               </div>
             )}
+
+            {status === "success" && groupedVisible.length === 0 && remoteJobsCount === 0 && (
+              <EmptyState onAdjust={() => setView("search")} />
+            )}
+            {status === "success" && (groupedVisible.length > 0 || remoteJobsCount > 0) && (
+              <div className="jd-grouped-results">
+                {activeCountryTab !== "remote" &&
+                  groupedVisible
+                    .filter(
+                      (cg) =>
+                        activeCountryTab === "all" ||
+                        cg.country.toLowerCase() === activeCountryTab
+                    )
+                    .map((cg) => {
+                      const flag = COUNTRY_FLAGS[cg.country.toLowerCase()] || "🌐";
+                      return (
+                        <CountrySection
+                          key={cg.country}
+                          cg={cg}
+                          layout={layout}
+                          sort={sort}
+                          flag={flag}
+                        />
+                      );
+                    })}
+
+                {activeCountryTab === "remote" && remoteGroupVisible && (
+                  <CountrySection
+                    key="Remote"
+                    cg={remoteGroupVisible}
+                    layout={layout}
+                    sort={sort}
+                    flag="💻"
+                  />
+                )}
+              </div>
+            )}
+
+
           </main>
 
           <button className="jd-fab" onClick={() => setDrawerOpen(true)}>

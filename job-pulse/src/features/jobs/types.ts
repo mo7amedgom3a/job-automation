@@ -23,6 +23,7 @@ export interface Job {
   easy_apply?: boolean;
   job_type?: string;
   job_level?: string;
+  is_remote?: boolean;
 }
 
 export interface JobBoard {
@@ -41,4 +42,41 @@ export interface PaginatedSearchResponse {
   offset: number;
   results: CountryGroup[];
 }
+
+export interface CountryInfo {
+  name: string;
+  job_boards: string[];
+  spiders: string[];
+}
+
+export interface CountriesResponse {
+  countries: Record<string, CountryInfo>;
+}
+
+export interface SubAggregateRequest {
+  country: string;
+  job_board: string;
+}
+
+export interface SubAggregateResponse {
+  status: string;
+  message: string;
+}
+
+export interface CacheStatsResponse {
+  seen_urls: number;
+  oldest_entry: string | null;
+}
+
+export interface ClearCacheResponse {
+  cleared: number;
+  message: string;
+}
+
+export interface DeleteOldJobsResponse {
+  deleted_count: number;
+  deleted_jobs: Job[];
+}
+
+
 

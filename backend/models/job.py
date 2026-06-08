@@ -276,6 +276,16 @@ class SubAggregateRequest(BaseModel):
     job_board: str = Field(..., description="Job board name (e.g. linkedin, indeed).", examples=["linkedin"])
 
 
+class CountryInfo(BaseModel):
+    name: str = Field(description="Display name of the country.")
+    job_boards: list[str] = Field(description="List of supported job boards (e.g. ['linkedin', 'indeed']).")
+    spiders: list[str] = Field(description="List of specific spider names associated with this country.")
+
+
+class CountriesResponse(BaseModel):
+    countries: dict[str, CountryInfo] = Field(description="Dictionary of supported country slugs mapped to their details.")
+
+
 class JobItem(BaseModel):
     id: str = Field(description="Unique MD5 hash fingerprint generated from the job URL.")
     title: str = Field(description="Title of the job posting.")
@@ -318,3 +328,15 @@ class JobRecord:
     salary: str
     source: str
     scraped_at: str
+
+
+class DeleteOldJobsResponse(BaseModel):
+    deleted_count: int = Field(
+        description="The number of old jobs deleted from the database.",
+        examples=[10]
+    )
+    deleted_jobs: list[JobItem] = Field(
+        description="List of deleted job listings.",
+        default_factory=list
+    )
+

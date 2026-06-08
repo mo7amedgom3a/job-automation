@@ -13,7 +13,7 @@ from typing import Literal
 
 FetcherType = Literal["http", "dynamic", "stealth"]
 
-KEYWORDS = ["software engineer", "DevOps", "backend", "AWS", "terraform", "python", "Golang", "Full Stack", "Engineer", "Devloper", ".NET", "react", "frontend"]
+KEYWORDS = ["software engineer", "DevOps", "backend", "AWS", "terraform", "python", "Golang", "Full Stack", "Engineer", "Devloper", ".NET", "react", "frontend", "AI", "LLM", "API"]
 @dataclass
 class SiteConfig:
     name: str
@@ -85,12 +85,11 @@ SITES: list[SiteConfig] = [
     ),
     SiteConfig(
         name="linkedin",
-        start_urls=["https://www.linkedin.com/jobs/search?location=Cairo&geoId=101131993&distance=25&f_TPR=r86400"],
+        start_urls=["https://www.linkedin.com/jobs/search?location=Cairo"],
         keywords=KEYWORDS,
-        fetcher="stealth",
+        fetcher="http",
         download_delay=3.0,
         robots_txt_obey=False,
-        extra_fetch_kwargs={"network_idle": True},
     ),
     SiteConfig(
         name="indeed",
@@ -110,75 +109,75 @@ SITES: list[SiteConfig] = [
     # ─── LinkedIn Country-Specific Usecases ────────────────────────────────────
     SiteConfig(
         name="linkedin_sa",
-        start_urls=["https://www.linkedin.com/jobs/search?location=Saudi%20Arabia&geoId=100459316&f_TPR=r86400"],
+        start_urls=["https://sa.linkedin.com/jobs/search?location=Saudi%20Arabia&geoId=100459316"],
         keywords=KEYWORDS,
-        fetcher="stealth",
+        fetcher="http",
         download_delay=3.0,
         robots_txt_obey=False,
-        extra_fetch_kwargs={"network_idle": True},
     ),
     SiteConfig(
         name="linkedin_eg",
-        start_urls=["https://www.linkedin.com/jobs/search?location=Cairo&geoId=101131993&distance=25"],
+        start_urls=["https://www.linkedin.com/jobs/search?location=Cairo"],
         keywords=KEYWORDS,
-        fetcher="stealth",
+        fetcher="http",
         download_delay=3.0,
         robots_txt_obey=False,
-        extra_fetch_kwargs={"network_idle": True},
     ),
     SiteConfig(
         name="linkedin_ae",
-        start_urls=["https://www.linkedin.com/jobs/search?location=United%20Arab%20Emirates&geoId=104305776&f_TPR=r86400"],
+        start_urls=["https://ae.linkedin.com/jobs/search?location=United%20Arab%20Emirates&geoId=104305776"],
         keywords=KEYWORDS,
-        fetcher="stealth",
+        fetcher="http",
         download_delay=3.0,
         robots_txt_obey=False,
-        extra_fetch_kwargs={"network_idle": True},
     ),
     SiteConfig(
         name="linkedin_barcelona",
-        start_urls=["https://www.linkedin.com/jobs/search?location=Barcelona&geoId=107025191&f_TPR=r86400"],
+        start_urls=["https://www.linkedin.com/jobs/search?location=Barcelona&geoId=107025191"],
         keywords=KEYWORDS,
-        fetcher="stealth",
+        fetcher="http",
         download_delay=3.0,
         robots_txt_obey=False,
-        extra_fetch_kwargs={"network_idle": True},
     ),
     SiteConfig(
         name="linkedin_germany",
-        start_urls=["https://www.linkedin.com/jobs/search?location=Germany&geoId=101282230&f_TPR=r86400"],
+        start_urls=["https://de.linkedin.com/jobs/search?location=Germany&geoId=101282230"],
         keywords=KEYWORDS,
-        fetcher="stealth",
+        fetcher="http",
         download_delay=3.0,
         robots_txt_obey=False,
-        extra_fetch_kwargs={"network_idle": True},
+    ),
+    SiteConfig(
+        name="linkedin_uk",
+        start_urls=["https://uk.linkedin.com/jobs/search?location=United%20Kingdom&geoId=101165590&f_TPR=r86400&f_WT=2"],
+        keywords=KEYWORDS,
+        fetcher="http",
+        download_delay=3.0,
+        robots_txt_obey=False,
     ),
     SiteConfig(
         name="linkedin_poland",
-        start_urls=["https://www.linkedin.com/jobs/search?location=Poland&geoId=105072130&f_TPR=r86400"],
+        start_urls=["https://www.linkedin.com/jobs/search?location=Poland&geoId=105072130"],
         keywords=KEYWORDS,
-        fetcher="stealth",
+        fetcher="http",
         download_delay=3.0,
         robots_txt_obey=False,
-        extra_fetch_kwargs={"network_idle": True},
     ),
     SiteConfig(
         name="linkedin_spain",
-        start_urls=["https://www.linkedin.com/jobs/search?location=Spain&geoId=105646813&f_TPR=r86400"],
+        start_urls=["https://www.linkedin.com/jobs/search?location=Spain&geoId=105646813"],
         keywords=KEYWORDS,
-        fetcher="stealth",
+        fetcher="http",
         download_delay=3.0,
         robots_txt_obey=False,
-        extra_fetch_kwargs={"network_idle": True},
     ),
     SiteConfig(
         name="linkedin_canada",
-        start_urls=["https://www.linkedin.com/jobs/search?location=Canada&geoId=101174742&f_TPR=r86400"],
+        start_urls=["https://www.linkedin.com/jobs/search?location=Canada&geoId=101174742"],
         keywords=KEYWORDS,
-        fetcher="stealth",
+        fetcher="http",
         download_delay=3.0,
         robots_txt_obey=False,
-        extra_fetch_kwargs={"network_idle": True},
     ),
     # ─── Indeed Country-Specific Usecases ──────────────────────────────────────
     SiteConfig(
@@ -214,6 +213,36 @@ SITES: list[SiteConfig] = [
     SiteConfig(
         name="indeed_ae",
         start_urls=["https://ae.indeed.com/m/jobs"],
+        keywords=KEYWORDS,
+        fetcher="http",
+        download_delay=3.0,
+        robots_txt_obey=False,
+        next_page_selector="a[data-dd-action-name='next-page']::attr(href), a[data-testid='pagination-page-next']::attr(href), a[aria-label='Next Page']::attr(href), a[aria-label='Next']::attr(href), a[aria-label*='Next']::attr(href)",
+        extra_fetch_kwargs={
+            "timeout": 30,
+            "headers": {
+                "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/123.0.0.0 Mobile/15E148 Safari/604.1"
+            }
+        },
+    ),
+    SiteConfig(
+        name="indeed_uk",
+        start_urls=["https://uk.indeed.com/jobs?q=software+engineer&l=%22remote%22&fromage=1"],
+        keywords=KEYWORDS,
+        fetcher="http",
+        download_delay=3.0,
+        robots_txt_obey=False,
+        next_page_selector="a[data-dd-action-name='next-page']::attr(href), a[data-testid='pagination-page-next']::attr(href), a[aria-label='Next Page']::attr(href), a[aria-label='Next']::attr(href), a[aria-label*='Next']::attr(href)",
+        extra_fetch_kwargs={
+            "timeout": 30,
+            "headers": {
+                "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/123.0.0.0 Mobile/15E148 Safari/604.1"
+            }
+        },
+    ),
+    SiteConfig(
+        name="indeed_germany",
+        start_urls=["https://de.indeed.com/jobs?q=Software+Engineer&l=%22remote%22&fromage=1"],
         keywords=KEYWORDS,
         fetcher="http",
         download_delay=3.0,

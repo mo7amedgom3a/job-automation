@@ -126,7 +126,7 @@ class JobOrchestrator:
         hours_old = 24 if req.recent_hours == 24 else 72
         return {
             "LINKEDIN_KEYWORDS": search_term,
-            "LINKEDIN_TPR": "r86400" if hours_old == 24 else "r259200",
+            "LINKEDIN_TPR": "r86400" , # if hours_old == 24 else "r86400"
             "INDEED_QUERY": search_term,
             "INDEED_FROMAGE": "1" if hours_old == 24 else "3",
             "INDEED_LIMIT": str(DEFAULT_INDEED_LIMIT),
@@ -163,7 +163,9 @@ class JobOrchestrator:
         elif "emirates" in country or "ae" in country or "uae" in country:
             selected = ["linkedin_ae", "indeed_ae"]
         elif "germany" in country:
-            selected = ["linkedin_germany"]
+            selected = ["linkedin_germany", "indeed_germany"]
+        elif "united kingdom" in country or "uk" in country or "gb" in country or "london" in location_lower:
+            selected = ["linkedin_uk", "indeed_uk"]
         elif "poland" in country:
             selected = ["linkedin_poland"]
         elif "spain" in country or "barcelona" in location_lower:

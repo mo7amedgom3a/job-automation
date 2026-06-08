@@ -32,7 +32,7 @@ def run_usecase(site_name: str, output_filename: str) -> None:
         os.environ["INDEED_LIMIT"] = str(DEFAULT_INDEED_LIMIT)
         logger.info("Configured Indeed constraints: 3 days, 50 jobs limit")
     elif "linkedin" in site_name:
-        os.environ["LINKEDIN_TPR"] = "r86400"
+        os.environ["LINKEDIN_TPR"] = "r86400" 
         logger.info("Configured LinkedIn constraints: latest 24 hours TPR")
 
     # Override max_pages dynamically to ensure up to 50 jobs are fetched
